@@ -3,6 +3,12 @@ package LoanClasses;
 import DateClass.Date;
 
 public class AvailedLoans {
+
+    enum LoanStatus {
+        ACTIVE,
+        CLOSED;
+    }
+    
     private int loan_id;
     private int loan_option_id;
     private double principle_amount;
@@ -14,10 +20,10 @@ public class AvailedLoans {
     private Date start_date;
     private Date end_date;
     private Date month_payment_day;
-    private enum loan_status;
+    private LoanStatus loan_status;
     private int customer_id;
 
     public AvailedLoans(){
-        
+
     }
 }

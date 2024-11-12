@@ -31,13 +31,6 @@ public class LoanOptions {
         }
     }
 
-    public int getLoanOptionId() {
-        return loan_option_id;
-    }
-
-    public void setLoanOptionId(int loan_option_id) {
-        this.loan_option_id = loan_option_id;
-    }
 
     public String getLoanOptionType() {
         return loan_option_type;
