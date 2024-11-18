@@ -1,7 +1,9 @@
+package Model;
+
 import java.sql.*;
 import java.util.Scanner;
 
-public class Main {
+public class UserInfo {
     public static void main(String[] args) {
         try (Connection con = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/bankdb",
