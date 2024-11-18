@@ -1,75 +1,65 @@
 package Model;
+import java.sql.*;
 
 public class LoanOptions {
-    private int loan_option_id;
-    private String loan_option_type;
-    private double interest_rate;
-    private int loan_duration_year;
-    private double max_loan_amount;
-    private double min_loan_amount;
-    
-    private static double personal_loan_rate = 0.07; //7% for Personal Loans
-    private static double auto_loan_rate = 0.04;     //4% for Auto Loans
-    private static double mortgage_loan_rate = 0.05; //5% for Mortgages
+    public LoanOptions(String url, String user, String password){
+        try {
+            Connection connection = DriverManager.getConnection(
+                    url,
+                    user,
+                    password
+            );
 
-    public LoanOptions(int loan_option_id){
+            Statement statement1 = connection.createStatement();
+            Statement statement2 = connection.createStatement();
+            Statement statement3 = connection.createStatement();
 
-        if (loan_option_id == 1){
-            this.loan_duration_year = loan_option_id;
-            this.loan_option_type = "Personal Loan";
-            this.interest_rate = personal_loan_rate;     
-        } else if (loan_option_id == 2) {
-            this.loan_duration_year = loan_option_id;
-            this.loan_option_type = "Auto Loan";
-            this.interest_rate = auto_loan_rate;     
-        } else if (loan_option_id == 3){
-            this.loan_duration_year = loan_option_id;
-            this.loan_option_type = "Mortgage";
-            this.interest_rate = mortgage_loan_rate;    
-        } else {
-            throw new IllegalArgumentException("Invalid loan option ID: " + loan_option_id);       
+            String selectQuery1 = "SELECT * FROM loan_options WHERE loan_option_ID = 1";
+            String selectQuery2 = "SELECT * FROM loan_options WHERE loan_option_ID = 2";
+            String selectQuery3 = "SELECT * FROM loan_options WHERE loan_option_ID = 3";
+
+            ResultSet results1 = statement1.executeQuery(selectQuery1);
+            ResultSet results2 = statement2.executeQuery(selectQuery2);
+            ResultSet results3 = statement3.executeQuery(selectQuery3);
+
+            if (!results1.next()){
+                String personal_loan = "INSERT INTO loan_options "
+                        + "(loan_option_id, loan_option_type, interest_rate, loan_duration_month, max_loan_amt, min_loan_amt) "
+                        + "VALUES ('1', 'Personal Loan', '0.07', '24', '1000000', '20000')";
+                statement1.executeUpdate(personal_loan);
+            }
+            if (!results2.next()){
+                String auto_loan = "INSERT INTO loan_options "
+                        + "(loan_option_id, loan_option_type, interest_rate, loan_duration_month, max_loan_amt, min_loan_amt) "
+                        + "VALUES ('2', 'Auto Loan', '0.10', '36', '3000000', '250000')";
+                statement2.executeUpdate(auto_loan);
+            }
+
+            if (!results3.next()) {
+                String emergency_loan = "INSERT INTO loan_options "
+                        + "(loan_option_id, loan_option_type, interest_rate, loan_duration_month, max_loan_amt, min_loan_amt) "
+                        + "VALUES ('3', 'Emergency Loan', '0.05', '24', '750000', '20000')";
+                statement3.executeUpdate(emergency_loan);
+
+            }
+
+            System.out.println("Insert Complete!");
+
+            results1.close();
+            results2.close();
+            results3.close();
+            statement1.close();
+            statement2.close();
+            statement3.close();
+            connection.close();
+
+        } catch(SQLException e){
+            e.printStackTrace();
         }
+
     }
 
+    public void addLoanOption(){
 
-    public String getLoanOptionType() {
-        return loan_option_type;
     }
-
-    public void setLoanOptionType(String loan_option_type) {
-        this.loan_option_type = loan_option_type;
-    }
-
-    public double getInterestRate() {
-        return interest_rate;
-    }
-
-    public void setInterestRate(double interest_rate) {
-        this.interest_rate = interest_rate;
-    }
-
-    public int getLoanDurationYear() {
-        return loan_duration_year;
-    }
-
-    public void setLoanDurationYear(int loan_duration_year) {
-        this.loan_duration_year = loan_duration_year;
-    }
-
-    public double getMaxLoanAmount() {
-        return max_loan_amount;
-    }
-
-    public void setMaxLoanAmount(double max_loan_amount) {
-        this.max_loan_amount = max_loan_amount;
-    }
-
-    public double getMinLoanAmount() {
-        return min_loan_amount;
-    }
-
-    public void setMinLoanAmount(double min_loan_amount) {
-        this.min_loan_amount = min_loan_amount;
-    }
-
 }
