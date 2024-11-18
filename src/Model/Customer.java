@@ -3,7 +3,7 @@ package Model;
 import java.sql.*;
 import java.util.Scanner;
 
-public class UserInfo {
+public class Customer {
 
     public static void signUp() {
         try (Connection con = DriverManager.getConnection(
