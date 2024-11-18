@@ -11,9 +11,11 @@ public class Main {
         while(!stop){
             switch (BankWindow.chooseWindow()){
                 case 1:
+                    System.out.print("\033\143");
                     System.out.println("test1");
                     break;
                 case 2:
+                    System.out.print("\033\143");
                     System.out.println("test2");
                     break;
                 case 3:
