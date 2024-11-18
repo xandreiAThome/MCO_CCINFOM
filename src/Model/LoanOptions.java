@@ -1,4 +1,4 @@
-package LoanClasses;
+package Model;
 
 public class LoanOptions {
     private int loan_option_id;

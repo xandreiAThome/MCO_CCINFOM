@@ -1,4 +1,4 @@
-package LoanClasses;
+package Model;
 
 import DateClass.Date;
 
