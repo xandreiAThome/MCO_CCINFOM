@@ -2,13 +2,13 @@ package View;
 
 import HelperClass.UserInput;
 
-public class CustomerOptions {
+public class EmployeeOptions {
     public static void showOptions(){
-        System.out.println("1 - Sign Up\n2 - Login");
+        System.out.println("1 - Add Loan Options");
         int option = Integer.parseInt(UserInput.getScanner().nextLine());
         while (option < 1 || option > 2) {
             System.out.println("\nInvalid option Choose again");
-            System.out.println("1 - Sign Up\n2 - Login");
+            System.out.println("1 - Add Loan Options");
             System.out.print("Choose Window: ");
             option = Integer.parseInt(UserInput.getScanner().nextLine());
         }
@@ -20,13 +20,4 @@ public class CustomerOptions {
                 break;
         }
     }
-
-    public static login(){
-
-    }
-
-    public static signUp(){
-
-    }
-
 }

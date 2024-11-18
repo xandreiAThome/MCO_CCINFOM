@@ -1,6 +1,9 @@
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+
 import View.BankWindow;
+import View.CustomerOptions;
+import View.EmployeeOptions;
 
 import java.io.IOException;
 
@@ -12,11 +15,11 @@ public class Main {
             switch (BankWindow.chooseWindow()){
                 case 1:
                     System.out.print("\033\143");
-                    System.out.println("test1");
+                    CustomerOptions.showOptions();
                     break;
                 case 2:
                     System.out.print("\033\143");
-                    System.out.println("test2");
+                    EmployeeOptions.showOptions();
                     break;
                 case 3:
                     stop = true;
