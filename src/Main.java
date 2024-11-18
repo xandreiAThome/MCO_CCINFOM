@@ -6,10 +6,13 @@ import View.CustomerOptions;
 import View.EmployeeOptions;
 
 import java.io.IOException;
+import java.util.Date;
 
 public class Main {
     // Test the connection
     public static void main(String[] args) {
+        Date d = new Date();
+        System.out.println(d);
         boolean stop = false;
         while(!stop){
             switch (BankWindow.chooseWindow()){

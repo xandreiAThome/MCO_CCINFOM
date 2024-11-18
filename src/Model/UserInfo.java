@@ -58,9 +58,10 @@ public class UserInfo {
                     System.out.println("-----------------------");
                 }
             }
-
+            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
     }
 }
