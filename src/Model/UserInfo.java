@@ -12,7 +12,7 @@ public class UserInfo {
                 "password");
              Scanner scanner = new Scanner(System.in)) {
 
-
+            // Get user input
             System.out.print("Enter your first name: ");
             String firstName = scanner.nextLine();
 
@@ -28,7 +28,24 @@ public class UserInfo {
             System.out.print("Enter your date of birth (YYYY-MM-DD): ");
             String dob = scanner.nextLine();
 
+            // Check if user already exists
+            String checkQuery = "SELECT * FROM customer WHERE customer_first_name = ? AND customer_last_name = ? AND phone_number = ? AND email_address = ? AND birth_date = ?";
+            try (PreparedStatement checkStatement = con.prepareStatement(checkQuery)) {
+                checkStatement.setString(1, firstName);
+                checkStatement.setString(2, lastName);
+                checkStatement.setString(3, phone);
+                checkStatement.setString(4, email);
+                checkStatement.setString(5, dob);
 
+                try (ResultSet resultSet = checkStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        System.out.println("The user already exists in the database.");
+                        return; // Exit the method if the user exists
+                    }
+                }
+            }
+
+            // Insert the data into the database
             String insertQuery = "INSERT INTO customer (customer_first_name, customer_last_name, phone_number, email_address, birth_date) " +
                     "VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement preparedStatement = con.prepareStatement(insertQuery)) {
@@ -44,7 +61,7 @@ public class UserInfo {
                 }
             }
 
-
+            // Retrieve and display all records from the customer table
             String selectQuery = "SELECT * FROM customer";
             try (Statement statement = con.createStatement();
                  ResultSet res = statement.executeQuery(selectQuery)) {
