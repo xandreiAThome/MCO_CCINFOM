@@ -4,9 +4,23 @@ package Model;
 import HelperClass.UserInput;
 
 import java.sql.*;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Customer {
+    private int customer_id;
+    private String customer_first_name, customer_last_name;
+    private Date birth_date;
+    private String phone_number, email_address;
+
+    public Customer(int id, String firstName, String lastName, java.sql.Date birthDate, String phoneNum, String email){
+        customer_id = id;
+        customer_first_name = firstName;
+        customer_last_name = lastName;
+        birth_date = new Date(birthDate.getTime());
+        phone_number = phoneNum;
+        email_address = email;
+    }
 
     public static void signUp() {
         try (Connection con = DriverManager.getConnection(
@@ -28,13 +42,12 @@ public class Customer {
                 checkStatement.setString(2, lastName);
 
                 try (ResultSet resultSet = checkStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        System.out.println("The user already exists in the database.");
-                        return; // Exit the method if the user exists
+                    if(resultSet.next()){
+                        System.out.println("Account already exists");
+                        return;
                     }
                 }
             }
-
 
             System.out.print("Enter your phone number: ");
             String phone = UserInput.getScanner().nextLine();
@@ -98,7 +111,12 @@ public class Customer {
                 try(ResultSet res = statement.executeQuery()){
                     if(res.next()){
                         System.out.println("Logged In " + firstName + " " + lastName);
-                        Account.getAccount(res.getInt("customer_id"));
+                        Customer loggedInCustomer = new Customer(res.getInt("customer_id"),
+                                res.getString("customer_first_name"), res.getString("customer_last_name"),
+                                res.getDate("birth_date"), res.getString("phone_number"),
+                                res.getString("email_address"));
+                        showCustomerActions(loggedInCustomer);
+
                     } else {
                         System.out.println("No existing customer record");
                     }
@@ -109,4 +127,19 @@ public class Customer {
             e.printStackTrace();
         }
     }
+
+    private static void showCustomerActions(Customer loggedInSession){
+        System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail new Loan");
+        System.out.print("Choose option: ");
+
+        int option = Integer.parseInt(UserInput.getScanner().nextLine());
+
+        while (option < 1 || option > 4) {
+            System.out.println("\nInvalid option Choose again");
+            System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail new Loan");
+            System.out.print("Choose Window: ");
+            option = Integer.parseInt(UserInput.getScanner().nextLine());
+        }
+    }
+
 }

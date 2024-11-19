@@ -1,7 +1,10 @@
 package View;
 
 import HelperClass.UserInput;
+import Model.Account;
 import Model.Customer;
+
+import java.sql.*;
 
 public class CustomerOptions {
     public static void showOptions() {
@@ -23,9 +26,5 @@ public class CustomerOptions {
                 Customer.login();
                 break;
         }
-    }
-
-    public static void login() {
-        System.out.println("Login functionality is not yet implemented.");
     }
 }
