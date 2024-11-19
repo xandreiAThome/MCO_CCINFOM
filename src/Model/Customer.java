@@ -142,4 +142,28 @@ public class Customer {
         }
     }
 
+    public int getCustomer_id(){
+        return customer_id;
+    }
+
+    public String getCustomer_first_name(){
+        return customer_first_name;
+    }
+
+    public String getCustomer_last_name(){
+        return customer_last_name;
+    }
+
+    public String getPhone_number(){
+        return phone_number;
+    }
+
+    public String getEmail_address(){
+        return email_address;
+    }
+
+    public Date getBirth_date(){
+        return birth_date;
+    }
+
 }
