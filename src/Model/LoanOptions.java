@@ -59,7 +59,56 @@ public class LoanOptions {
 
     }
 
-    public void addLoanOption(){
+    public void addLoanOption(String loan_option_type, double interest_rate, int loan_duration_month, double max_loan_amount, double min_loan_amount) {
+        try {
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "java",
+                    "password"
+            );
 
+            String selectQuery = "SELECT COUNT(loan_option_type) FROM loan_options WHERE loan_option_type = ?";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
+            preparedStatement.setString(1, loan_option_type);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                if (count > 0) {
+                    System.out.println("Record already exists. Exiting.");
+                } else {
+                    int id = 0;
+
+                    System.out.println("Record does not exist. Proceeding.");
+                    String newLoanTypeQuery = "INSERT INTO loan_options "
+                            + "(loan_option_id, loan_option_type, interest_rate, loan_duration_month, max_loan_amt, min_loan_amt) "
+                            + "VALUES (?,?,?,?,?,?)";
+
+                    Statement statementInt = connection.createStatement();
+                    ResultSet resultInt = statementInt.executeQuery("SELECT loan_option_id FROM loan_options ORDER BY loan_option_id DESC LIMIT 1");
+
+                    if (resultInt.next()) {
+                        id = resultInt.getInt("loan_option_id") + 1;
+                    }
+
+                    PreparedStatement preped = connection.prepareStatement(newLoanTypeQuery);
+                    preped.setInt(1, id);
+                    preped.setString(2, loan_option_type);
+                    preped.setDouble(3, interest_rate);
+                    preped.setInt(4, loan_duration_month);
+                    preped.setDouble(5, max_loan_amount);
+                    preped.setDouble(6, min_loan_amount);
+
+                    int rowsInserted = preped.executeUpdate();
+                    if (rowsInserted > 0) {
+                        System.out.println("New loan option inserted successfully.");
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
