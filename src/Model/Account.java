@@ -1,5 +1,7 @@
 package Model;
 
+import HelperClass.UserInput;
+
 import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.ArrayList;
@@ -45,10 +47,41 @@ public class Account {
         } catch (SQLException e){
             e.printStackTrace();
         }
+
+        System.out.print("Input Account ID to Open Account: ");
+        int acc_id = Integer.parseInt(UserInput.getScanner().nextLine());
+        viewAccountInfo(acc_id);
     }
 
-    public static void viewAccountInfo (){
-        System.out.println("");
+    public static void viewAccountInfo (int account_id){
+        try (Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/bankdb",
+                "java",
+                "password")) {
+            String checkQuery = "SELECT * FROM account WHERE account_id = ?";
+
+            try(PreparedStatement statement = con.prepareStatement(checkQuery)){
+                statement.setInt(1, account_id);
+
+                try(ResultSet res = statement.executeQuery()){
+                    while(res.next()){
+                        System.out.print("Account ID: " + res.getInt("account_id"));
+                        System.out.println("\tAccount type: " +res.getString("account_type"));
+                        System.out.println("Current Balance: " + res.getDouble("current_balance"));
+                    }
+                }
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        int option;
+        do{
+            System.out.println("1 - Deposit to Account\n2 - Withdraw from Account\n3 - Transfer to another Account");
+            option = Integer.parseInt(UserInput.getScanner().nextLine());
+        } while(option < 1 || option > 3);
+
+
     }
 
     public int getCustomer_id (){

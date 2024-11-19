@@ -138,6 +138,7 @@ public class Customer {
             switch (option) {
                 case 1:
                     System.out.println("View Accounts");
+                    Account.showAccounts(loggedInSession.customer_id);
                     break;
 
                 case 2:
