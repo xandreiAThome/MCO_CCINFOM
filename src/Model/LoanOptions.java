@@ -2,7 +2,8 @@ package Model;
 import java.sql.*;
 
 public class LoanOptions {
-    public LoanOptions(String url, String user, String password){
+
+    public void defaultLoan(String url, String user, String password){
         try {
             Connection connection = DriverManager.getConnection(
                     url,

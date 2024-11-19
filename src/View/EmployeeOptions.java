@@ -5,7 +5,7 @@ import Model.LoanOptions;
 
 public class EmployeeOptions {
     public static void showOptions(){
-        LoanOptions loanOptions = new LoanOptions("jdbc:mysql://localhost:3306/bankdb", "java", "password");
+        LoanOptions loanOptions = new LoanOptions();
         System.out.println("1 - Add Loan Options");
         int option = Integer.parseInt(UserInput.getScanner().nextLine());
         while (option < 1 || option > 2) {

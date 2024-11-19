@@ -1,6 +1,7 @@
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
+import Model.LoanOptions;
 import View.BankWindow;
 import View.CustomerOptions;
 import View.EmployeeOptions;
@@ -11,6 +12,8 @@ import java.util.Date;
 public class Main {
     // Test the connection
     public static void main(String[] args) {
+        LoanOptions loanOptions = new LoanOptions();
+        loanOptions.defaultLoan("jdbc:mysql://localhost:3306/bankdb","java", "password");
         boolean stop = false;
         while(!stop){
             switch (BankWindow.chooseWindow()){
