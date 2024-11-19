@@ -87,7 +87,7 @@ public class AvailedLoans {
 
                     }
 
-                    double loanPrin = 0;
+                    double loanPrin;
                     do {
                         System.out.print("Enter the amount you want to loan: ");
                         loanPrin = Double.parseDouble(UserInput.getScanner().nextLine());
@@ -161,19 +161,19 @@ public class AvailedLoans {
     }
 
     public double firstMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm, double roundedPrincipleAmort) {
-        double answer =0;
+        double answer;
         answer = (roundedPrincipleAmort * (loanTerm - 1)) - principalAmount;
         return answer;
     }
 
     public double succMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm) {
-        double answer =0;
-        answer = (int) Math.floor((double) principalAmount / loanTerm);
+        double answer;
+        answer = (int) Math.floor(principalAmount / loanTerm);
         return answer;
     }
 
     public double interest_amortization(double principalAmount, int loanTerm, double interestRate) {
-        double answer =0;
+        double answer;
         answer=(principalAmount * interestRate / 100) / loanTerm;
         return answer;
     }
