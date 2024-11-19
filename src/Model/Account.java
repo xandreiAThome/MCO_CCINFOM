@@ -151,6 +151,7 @@ public class Account {
 
                 int rowsAffected = statement.executeUpdate();
                 if (rowsAffected > 0) {
+                    TransactionHistory.generateTransactionRecord("withdrawal", account_id, null, amount);
                     System.out.println("Withdrawn Successfully");
                 }
             }
@@ -196,6 +197,7 @@ public class Account {
                     System.out.println("Account doesn't exist");
                     return;
                 }
+                TransactionHistory.generateTransactionRecord("deposit", dest_id, null, amount);
             }
 
             String deductQuery = "UPDATE account SET current_balance = current_balance - ? WHERE account_id = ?";
@@ -207,6 +209,7 @@ public class Account {
                 int rowsAffected = statement.executeUpdate();
                 if (rowsAffected > 0) {
                     System.out.println("Transferred Successfully");
+                    TransactionHistory.generateTransactionRecord("transfer", account_id, null, amount);
                 }
             }
 
