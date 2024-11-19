@@ -218,6 +218,73 @@ public class Account {
         }
     }
 
+    public static void createNewAccount(int customer_id) {
+        try (Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/bankdb",
+                "java",
+                "password")) {
+
+            // Prompt user to select account type
+            String account_type = "";
+            int choice;
+            do {
+                System.out.println("Choose Account Type:");
+                System.out.println("1 - Savings");
+                System.out.println("2 - Checkings");
+                System.out.println("3 - Passbook");
+                choice = Integer.parseInt(UserInput.getScanner().nextLine());
+                switch (choice) {
+                    case 1:
+                        account_type = "Savings";
+                        break;
+                    case 2:
+                        account_type = "Checkings";
+                        break;
+                    case 3:
+                        account_type = "Passbook";
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Please select again.");
+                }
+            } while (choice < 1 || choice > 3);
+
+            // Prompt user for an initial deposit
+            System.out.print("Enter Initial Deposit Amount: ");
+            double initial_deposit = Double.parseDouble(UserInput.getScanner().nextLine());
+
+            // Insert new account into the database
+            String insertQuery = "INSERT INTO account (account_type, current_balance, date_opened, interest_rate, account_status, customer_id) " +
+                    "VALUES (?, ?, NOW(), ?, 'Active', ?)";
+            try (PreparedStatement statement = con.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setString(1, account_type);
+                statement.setDouble(2, initial_deposit);
+                //statement.setDouble(3, interest_rate);
+                statement.setInt(4, customer_id);
+
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected > 0) {
+                    // Retrieve the generated account ID
+                    try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            int newAccountId = generatedKeys.getInt(1);
+                            System.out.println("Account created successfully!");
+                            System.out.println("New Account ID: " + newAccountId);
+                            System.out.println("Account Type: " + account_type);
+                            System.out.println("Current Balance: " + initial_deposit);
+                           // System.out.println("Interest Rate: " + interest_rate * 100 + "%");
+                        }
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter valid numbers.");
+        }
+    }
+
+
 
     public int getCustomer_id (){
         return  customer_id;
