@@ -18,15 +18,15 @@ public class EmployeeOptions {
         switch (option){
             case 1:
                 System.out.println("Input the necessary Information for the new loan type: ");
-                System.out.println("Loan Type: ");
+                System.out.print("Loan Type: ");
                 String loanType = UserInput.getScanner().nextLine();
-                System.out.println("Interest Rate (decimal): ");
+                System.out.print("Interest Rate (decimal): ");
                 double interestRate = Double.parseDouble(UserInput.getScanner().nextLine());
-                System.out.println("Loan Duration (months): ");
+                System.out.print("Loan Duration (months): ");
                 int loanDur = Integer.parseInt(UserInput.getScanner().nextLine());
-                System.out.println("Max Loan Price: ");
+                System.out.print("Max Loan Price: ");
                 double maxLoan = Double.parseDouble(UserInput.getScanner().nextLine());
-                System.out.println("Minimum Loan Price: ");
+                System.out.print("Minimum Loan Price: ");
                 double minLoan = Double.parseDouble(UserInput.getScanner().nextLine());
 
                 loanOptions.addLoanOption(loanType,interestRate,loanDur,maxLoan,minLoan);
