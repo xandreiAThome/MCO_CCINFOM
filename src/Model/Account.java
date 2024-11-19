@@ -14,6 +14,17 @@ public class Account {
     private String account_status;
     private int customer_id;
 
+    public Account(int account_id, String account_type, double current_balance,
+                   Date date_opened, double interest_rate, String account_status, int customer_id){
+        this.account_id = account_id;
+        this.account_type = account_type;
+        this.current_balance = current_balance;
+        this.date_opened = date_opened;
+        this.interest_rate = interest_rate;
+        this.account_status =account_status;
+        this.customer_id = customer_id;
+    }
+
     public static void showAccounts(int customer_id){
         try (Connection con = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/bankdb",
@@ -38,6 +49,34 @@ public class Account {
 
     public static void viewAccountInfo (){
         System.out.println("");
+    }
+
+    public int getCustomer_id (){
+        return  customer_id;
+    }
+
+    public int getAccount_id(){
+        return account_id;
+    }
+
+    public String getAccount_type(){
+        return account_type;
+    }
+
+    public String getAccount_status(){
+        return account_status;
+    }
+
+    public double getCurrent_balance(){
+        return current_balance;
+    }
+
+    public double getInterest_rate(){
+        return interest_rate;
+    }
+
+    public Date getDate_opened(){
+        return date_opened;
     }
 
 }

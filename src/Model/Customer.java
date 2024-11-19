@@ -5,7 +5,6 @@ import HelperClass.UserInput;
 
 import java.sql.*;
 import java.util.Date;
-import java.util.Scanner;
 
 public class Customer {
     private int customer_id;
@@ -143,7 +142,7 @@ public class Customer {
     }
 
     public int getCustomer_id(){
-        return customer_id;
+        return this.customer_id;
     }
 
     public String getCustomer_first_name(){
