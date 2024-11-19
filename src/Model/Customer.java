@@ -1,6 +1,8 @@
 //reupload
 package Model;
 
+import HelperClass.UserInput;
+
 import java.sql.*;
 import java.util.Scanner;
 
@@ -10,15 +12,14 @@ public class Customer {
         try (Connection con = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/bankdb",
                 "java",
-                "password");
-             Scanner scanner = new Scanner(System.in)) {
+                "password")) {
 
             // Get user input
             System.out.print("Enter your first name: ");
-            String firstName = scanner.nextLine();
+            String firstName = UserInput.getScanner().nextLine();
 
             System.out.print("Enter your last name: ");
-            String lastName = scanner.nextLine();
+            String lastName = UserInput.getScanner().nextLine();
 
             // Check if user already exists
             String checkQuery = "SELECT * FROM customer WHERE customer_first_name = ? AND customer_last_name = ?";
@@ -36,13 +37,13 @@ public class Customer {
 
 
             System.out.print("Enter your phone number: ");
-            String phone = scanner.nextLine();
+            String phone = UserInput.getScanner().nextLine();
 
             System.out.print("Enter your email: ");
-            String email = scanner.nextLine();
+            String email = UserInput.getScanner().nextLine();
 
             System.out.print("Enter your date of birth (YYYY-MM-DD): ");
-            String dob = scanner.nextLine();
+            String dob = UserInput.getScanner().nextLine();
 
             // Insert the data into the database
             String insertQuery = "INSERT INTO customer (customer_first_name, customer_last_name, phone_number, email_address, birth_date) " +
@@ -75,7 +76,6 @@ public class Customer {
                     System.out.println("-----------------------");
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -17,11 +17,11 @@ public class Main {
         while(!stop){
             switch (BankWindow.chooseWindow()){
                 case 1:
-                    System.out.print("\033\143");
+//                    System.out.print("\033\143");
                     CustomerOptions.showOptions();
                     break;
                 case 2:
-                    System.out.print("\033\143");
+//                    System.out.print("\033\143");
                     EmployeeOptions.showOptions();
                     break;
                 case 3:
