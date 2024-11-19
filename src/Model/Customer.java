@@ -20,23 +20,11 @@ public class Customer {
             System.out.print("Enter your last name: ");
             String lastName = scanner.nextLine();
 
-            System.out.print("Enter your phone number: ");
-            String phone = scanner.nextLine();
-
-            System.out.print("Enter your email: ");
-            String email = scanner.nextLine();
-
-            System.out.print("Enter your date of birth (YYYY-MM-DD): ");
-            String dob = scanner.nextLine();
-
             // Check if user already exists
-            String checkQuery = "SELECT * FROM customer WHERE customer_first_name = ? AND customer_last_name = ? AND phone_number = ? AND email_address = ? AND birth_date = ?";
+            String checkQuery = "SELECT * FROM customer WHERE customer_first_name = ? AND customer_last_name = ?";
             try (PreparedStatement checkStatement = con.prepareStatement(checkQuery)) {
                 checkStatement.setString(1, firstName);
                 checkStatement.setString(2, lastName);
-                checkStatement.setString(3, phone);
-                checkStatement.setString(4, email);
-                checkStatement.setString(5, dob);
 
                 try (ResultSet resultSet = checkStatement.executeQuery()) {
                     if (resultSet.next()) {
@@ -45,6 +33,16 @@ public class Customer {
                     }
                 }
             }
+
+
+            System.out.print("Enter your phone number: ");
+            String phone = scanner.nextLine();
+
+            System.out.print("Enter your email: ");
+            String email = scanner.nextLine();
+
+            System.out.print("Enter your date of birth (YYYY-MM-DD): ");
+            String dob = scanner.nextLine();
 
             // Insert the data into the database
             String insertQuery = "INSERT INTO customer (customer_first_name, customer_last_name, phone_number, email_address, birth_date) " +
