@@ -127,19 +127,37 @@ public class Customer {
         }
     }
 
-    private static void showCustomerActions(Customer loggedInSession){
-        System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail new Loan");
-        System.out.print("Choose option: ");
+    private static void showCustomerActions(Customer loggedInSession) {
+        int option;
 
-        int option = Integer.parseInt(UserInput.getScanner().nextLine());
-
-        while (option < 1 || option > 4) {
-            System.out.println("\nInvalid option Choose again");
-            System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail new Loan");
-            System.out.print("Choose Window: ");
+        do {
+            System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail New Loan");
+            System.out.print("Choose option: ");
             option = Integer.parseInt(UserInput.getScanner().nextLine());
-        }
+
+            switch (option) {
+                case 1:
+                    System.out.println("View Accounts");
+                    break;
+
+                case 2:
+                    System.out.println("Open New Account");
+                    break;
+
+                case 3:
+                    System.out.println("View Loans");
+                    break;
+
+                case 4:
+                    System.out.println("Avail Loans");
+                    break;
+
+                default:
+                    System.out.println("\nInvalid option. Please choose again.");
+            }
+        } while (option < 1 || option > 4);
     }
+
 
     public int getCustomer_id(){
         return this.customer_id;
