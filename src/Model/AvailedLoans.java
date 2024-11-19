@@ -7,7 +7,7 @@ public class AvailedLoans {
 
     enum LoanStatus {
         ACTIVE,
-        CLOSED;
+        CLOSED
     }
     
     private int loan_id;
