@@ -23,7 +23,7 @@ public class AvailedLoans {
     private LoanStatus loan_status;
     private int customer_id;
 
-    public AvailedLoans(){
+    public void viewLoans(int customer_id){
 
     }
 }
