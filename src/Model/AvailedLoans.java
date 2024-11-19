@@ -163,19 +163,19 @@ public class AvailedLoans {
     public double firstMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm, double roundedPrincipleAmort) {
         double answer;
         answer = (roundedPrincipleAmort * (loanTerm - 1)) - principalAmount;
-        return answer;
+        return Math.round(answer * 100.0) / 100.0;
     }
 
     public double succMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm) {
         double answer;
         answer = (int) Math.floor(principalAmount / loanTerm);
-        return answer;
+        return Math.round(answer * 100.0) / 100.0;
     }
 
     public double interest_amortization(double principalAmount, int loanTerm, double interestRate) {
         double answer;
         answer=(principalAmount * interestRate / 100) / loanTerm;
-        return answer;
+        return Math.round(answer * 100.0) / 100.0;
     }
 
 
