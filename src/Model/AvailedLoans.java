@@ -68,8 +68,15 @@ public class AvailedLoans {
 
                     double loanPrin;
                     do {
+
+                        //System.out.println("Max = " + max);  TEST
+                        //System.out.println("Min = " + min);   TEST
+
                         System.out.print("Enter the amount you want to loan: ");
                         loanPrin = Double.parseDouble(UserInput.getScanner().nextLine());
+
+                        //System.out.println("loanPrin = " + loanPrin);  TEST
+
                         if (loanPrin < min || loanPrin > max) {
                             System.out.println("Invalid choice. Please select an amount between " + min +  "and " + max + ".");
                         }
@@ -92,7 +99,12 @@ public class AvailedLoans {
                         money = moneyResult.getDouble("current_balance");
                     }
 
+                    System.out.println("TEST Principle Amort = " + principleAmort);
+                    System.out.println("First Month Pay = " + firstMonthPay);
+
                     double sufficientBalChecker = principleAmort + firstMonthPay;
+                    //System.out.println("Money = " + money);  TEST
+                    //System.out.println("Sufficient Bal Checker = " + sufficientBalChecker);  TEST
                     if (money >= sufficientBalChecker){
 
                         System.out.println("Approved!");
@@ -142,6 +154,7 @@ public class AvailedLoans {
         }
     }
 
+    //TO DO!!! fix wrong first month pay
     public double firstMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm, double roundedPrincipleAmort) {
         double answer;
         answer = (roundedPrincipleAmort * (loanTerm - 1)) - principalAmount;
