@@ -143,6 +143,7 @@ public class Customer {
 
                 case 2:
                     System.out.println("Open New Account");
+                    Account.createNewAccount(loggedInSession.customer_id);
                     break;
 
                 case 3:
