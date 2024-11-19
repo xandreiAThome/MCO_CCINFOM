@@ -81,8 +81,81 @@ public class Account {
             option = Integer.parseInt(UserInput.getScanner().nextLine());
         } while(option < 1 || option > 3);
 
+        switch (option){
+            case 1:
+                depositToAccount(account_id);
+                break;
+            case 2:
+                withdrawFromAccount(account_id);
+                break;
+        }
 
     }
+
+    public static void depositToAccount(int account_id){
+        try (Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/bankdb",
+                "java",
+                "password")) {
+            System.out.print("Input amount to deposit: ");
+            double amount = Double.parseDouble(UserInput.getScanner().nextLine());
+            String query = "UPDATE account SET current_balance = current_balance + ? WHERE account_id = ?";
+
+            try(PreparedStatement statement = con.prepareStatement(query)){
+                statement.setDouble(1, amount);
+                statement.setInt(2, account_id);
+
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Deposited Successfully");
+                }
+            }
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void withdrawFromAccount(int account_id){
+        try (Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/bankdb",
+                "java",
+                "password")) {
+            System.out.print("Input amount to withdraw: ");
+            double amount = Double.parseDouble(UserInput.getScanner().nextLine());
+
+            String query = "SELECT current_balance FROM account WHERE account_id = ?";
+
+            try(PreparedStatement statement = con.prepareStatement(query)){
+                statement.setInt(1, account_id);
+
+                try(ResultSet res = statement.executeQuery()){
+                    if(res.next()){
+                        if(amount > res.getDouble("current_balance")){
+                            System.out.println("Insufficient Balance");
+                            return;
+                        }
+                    }
+                }
+            }
+
+            String updateQuery = "UPDATE account SET current_balance = current_balance - ? WHERE account_id = ?";
+
+            try(PreparedStatement statement = con.prepareStatement(updateQuery)){
+                statement.setDouble(1, amount);
+                statement.setInt(2, account_id);
+
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Withdrawn Successfully");
+                }
+            }
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
 
     public int getCustomer_id (){
         return  customer_id;
