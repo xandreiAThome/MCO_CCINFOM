@@ -20,7 +20,7 @@ public class CustomerOptions {
                 Customer.signUp();
                 break;
             case 2:
-                login();
+                Customer.login();
                 break;
         }
     }
