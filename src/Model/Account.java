@@ -88,6 +88,9 @@ public class Account {
             case 2:
                 withdrawFromAccount(account_id);
                 break;
+            case 3:
+                transferToAnother(account_id);
+                break;
         }
 
     }
@@ -107,6 +110,7 @@ public class Account {
 
                 int rowsAffected = statement.executeUpdate();
                 if (rowsAffected > 0) {
+                    TransactionHistory.generateTransactionRecord("deposit", account_id, null, amount);
                     System.out.println("Deposited Successfully");
                 }
             }
@@ -148,6 +152,61 @@ public class Account {
                 int rowsAffected = statement.executeUpdate();
                 if (rowsAffected > 0) {
                     System.out.println("Withdrawn Successfully");
+                }
+            }
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void transferToAnother(int account_id){
+        try (Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/bankdb",
+                "java",
+                "password")) {
+            System.out.print("Input amount to transfer: ");
+            double amount = Double.parseDouble(UserInput.getScanner().nextLine());
+
+            String query = "SELECT current_balance FROM account WHERE account_id = ?";
+
+            try(PreparedStatement statement = con.prepareStatement(query)){
+                statement.setInt(1, account_id);
+
+                try(ResultSet res = statement.executeQuery()){
+                    if(res.next()){
+                        if(amount > res.getDouble("current_balance")){
+                            System.out.println("Insufficient Balance");
+                            return;
+                        }
+                    }
+                }
+            }
+            System.out.print("Input Account ID to transfer to: ");
+            int dest_id = Integer.parseInt(UserInput.getScanner().nextLine());
+
+            String transferQuery = "UPDATE account SET current_balance = current_balance + ? WHERE account_id = ?";
+
+            try(PreparedStatement statement = con.prepareStatement(transferQuery)){
+                statement.setDouble(1, amount);
+                statement.setInt(2, dest_id);
+
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected == 0) {
+                    System.out.println("Account doesn't exist");
+                    return;
+                }
+            }
+
+            String deductQuery = "UPDATE account SET current_balance = current_balance - ? WHERE account_id = ?";
+
+            try(PreparedStatement statement = con.prepareStatement(deductQuery)){
+                statement.setDouble(1, amount);
+                statement.setInt(2, account_id);
+
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Transferred Successfully");
                 }
             }
 

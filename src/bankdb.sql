@@ -1,4 +1,4 @@
--- MySQL dump 10.13  Distrib 8.0.38, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.40, for Win64 (x86_64)
 --
 -- Host: localhost    Database: bankdb
 -- ------------------------------------------------------
@@ -35,7 +35,7 @@ CREATE TABLE `account` (
   UNIQUE KEY `account_id_UNIQUE` (`account_id`),
   KEY `customer_id_idx` (`customer_id`),
   CONSTRAINT `customer_id` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -44,7 +44,7 @@ CREATE TABLE `account` (
 
 LOCK TABLES `account` WRITE;
 /*!40000 ALTER TABLE `account` DISABLE KEYS */;
-INSERT INTO `account` VALUES (1,'savings',12000.00,3000.00,'2024-11-13',0.50,'active',1);
+INSERT INTO `account` VALUES (1,'savings',12050.00,3000.00,'2024-11-13',0.50,'active',1),(2,'checkings',15010.00,5000.00,'2024-11-19',0.20,'active',1);
 /*!40000 ALTER TABLE `account` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -104,7 +104,7 @@ CREATE TABLE `customer` (
   `email_address` varchar(45) NOT NULL,
   PRIMARY KEY (`customer_id`),
   UNIQUE KEY `customer_id_UNIQUE` (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -113,7 +113,7 @@ CREATE TABLE `customer` (
 
 LOCK TABLES `customer` WRITE;
 /*!40000 ALTER TABLE `customer` DISABLE KEYS */;
-INSERT INTO `customer` VALUES (1,'Juan','Tamad','2000-12-11','09123456789','juan@lol.com');
+INSERT INTO `customer` VALUES (1,'Juan','Tamad','2000-12-11','09123456789','juan@lol.com'),(2,'Ken','Lo','2004-01-12','09','@a'),(3,'Juan','Tamad','2004-12-01','1','1');
 /*!40000 ALTER TABLE `customer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -133,7 +133,7 @@ CREATE TABLE `loan_options` (
   `min_loan_amt` decimal(16,2) NOT NULL,
   PRIMARY KEY (`loan_option_id`),
   UNIQUE KEY `idloan_options_UNIQUE` (`loan_option_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -142,40 +142,42 @@ CREATE TABLE `loan_options` (
 
 LOCK TABLES `loan_options` WRITE;
 /*!40000 ALTER TABLE `loan_options` DISABLE KEYS */;
+INSERT INTO `loan_options` VALUES (1,'Personal Loan',0.07,24,1000000.00,20000.00),(2,'Auto Loan',0.10,36,3000000.00,250000.00),(3,'Emergency Loan',0.05,24,750000.00,20000.00);
 /*!40000 ALTER TABLE `loan_options` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `transcation_history`
+-- Table structure for table `transaction_history`
 --
 
-DROP TABLE IF EXISTS `transcation_history`;
+DROP TABLE IF EXISTS `transaction_history`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `transcation_history` (
+CREATE TABLE `transaction_history` (
   `transaction_id` int NOT NULL AUTO_INCREMENT,
-  `transaction_type` enum('deposit','withdrawal','loan_payment','transer') NOT NULL,
+  `transaction_type` enum('deposit','withdrawal','loan_payment','transfer') NOT NULL,
   `amount` decimal(16,2) NOT NULL,
   `transaction_date` datetime NOT NULL,
   `transaction_status` enum('success','processing','failed') NOT NULL,
-  `account_id` int NOT NULL,
-  `loan_id` int NOT NULL,
+  `account_id` int DEFAULT NULL,
+  `loan_id` int DEFAULT NULL,
   PRIMARY KEY (`transaction_id`),
   UNIQUE KEY `transaction_id_UNIQUE` (`transaction_id`),
   KEY `account_id_idx` (`account_id`),
   KEY `loan_id_idx` (`loan_id`),
   CONSTRAINT `account_id` FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`),
   CONSTRAINT `loan_id` FOREIGN KEY (`loan_id`) REFERENCES `availed_loans` (`loan_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `transcation_history`
+-- Dumping data for table `transaction_history`
 --
 
-LOCK TABLES `transcation_history` WRITE;
-/*!40000 ALTER TABLE `transcation_history` DISABLE KEYS */;
-/*!40000 ALTER TABLE `transcation_history` ENABLE KEYS */;
+LOCK TABLES `transaction_history` WRITE;
+/*!40000 ALTER TABLE `transaction_history` DISABLE KEYS */;
+INSERT INTO `transaction_history` VALUES (1,'deposit',10.00,'2024-11-19 00:00:00','success',1,NULL);
+/*!40000 ALTER TABLE `transaction_history` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -187,4 +189,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-13  9:58:13
+-- Dump completed on 2024-11-19 20:46:17
