@@ -154,6 +154,10 @@ public class Customer {
                     System.out.println("Avail Loans");
                     break;
 
+                case 5:
+                    System.out.println("Close account");
+                    Account.closeAccount(loggedInSession.customer_id);
+                    break;
                 default:
                     System.out.println("\nInvalid option. Please choose again.");
             }

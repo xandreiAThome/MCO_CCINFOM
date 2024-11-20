@@ -381,6 +381,98 @@ public class Account {
 
         } catch (SQLException e){
             e.printStackTrace();
+
+
+        }
+    }
+
+    public static void closeAccount(int account_id) {
+        try (Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/bankdb",
+                "java",
+                "password")) {
+
+            // Step 1: Verify the account balance is zero and no pending loans
+            String checkBalanceQuery = "SELECT current_balance, account_status FROM account WHERE account_id = ?";
+            double currentBalance = 0.0;
+            String accountStatus = "";
+
+            try (PreparedStatement statement = con.prepareStatement(checkBalanceQuery)) {
+                statement.setInt(1, account_id);
+                try (ResultSet res = statement.executeQuery()) {
+                    if (res.next()) {
+                        currentBalance = res.getDouble("current_balance");
+                        accountStatus = res.getString("account_status");
+                    } else {
+                        System.out.println("Account not found.");
+                        return;
+                    }
+                }
+            }
+
+            if (currentBalance != 0) {
+                System.out.println("Account cannot be closed. Balance is not zero.");
+                return;
+            }
+
+            if (!accountStatus.equalsIgnoreCase("Active")) {
+                System.out.println("Account cannot be closed. It is not in an Active state.");
+                return;
+            }
+
+            String checkLoansQuery = "SELECT COUNT(*) FROM loans WHERE account_id = ? AND loan_status = 'Pending'";
+            try (PreparedStatement statement = con.prepareStatement(checkLoansQuery)) {
+                statement.setInt(1, account_id);
+                try (ResultSet res = statement.executeQuery()) {
+                    if (res.next() && res.getInt(1) > 0) {
+                        System.out.println("Account cannot be closed. There are pending loans.");
+                        return;
+                    }
+                }
+            }
+
+            // Step 2: Check for any pending transactions or fees
+            String checkPendingTransactionsQuery = "SELECT COUNT(*) FROM transaction_history WHERE account_id = ? AND transaction_status = 'Pending'";
+            try (PreparedStatement statement = con.prepareStatement(checkPendingTransactionsQuery)) {
+                statement.setInt(1, account_id);
+                try (ResultSet res = statement.executeQuery()) {
+                    if (res.next() && res.getInt(1) > 0) {
+                        System.out.println("Account cannot be closed. There are pending transactions or fees.");
+                        return;
+                    }
+                }
+            }
+
+            // Step 3: Update the account status to "Closed"
+            String updateAccountQuery = "UPDATE account SET account_status = 'Closed' WHERE account_id = ?";
+            try (PreparedStatement statement = con.prepareStatement(updateAccountQuery)) {
+                statement.setInt(1, account_id);
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Account status updated to Closed.");
+                } else {
+                    System.out.println("Failed to update account status.");
+                    return;
+                }
+            }
+
+            // Step 4: Record the account closure in Transaction History
+            String insertTransactionQuery = "INSERT INTO transaction_history (account_id, transaction_type, transaction_date, amount) " +
+                    "VALUES (?, 'Account Closure', NOW(), 0.0)";
+            try (PreparedStatement statement = con.prepareStatement(insertTransactionQuery)) {
+                statement.setInt(1, account_id);
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Account closure recorded in transaction history.");
+                } else {
+                    System.out.println("Failed to record account closure.");
+                }
+            }
+
+            System.out.println("Account closed successfully.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
