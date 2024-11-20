@@ -233,8 +233,9 @@ public class Account {
                 "java",
                 "password")) {
 
-            // Prompt user to select account type
+
             String account_type = "";
+            double interest_rate = 0.0;
             int choice;
             do {
                 System.out.println("Choose Account Type:");
@@ -245,12 +246,15 @@ public class Account {
                 switch (choice) {
                     case 1:
                         account_type = "Savings";
+                        interest_rate = 0.03;
                         break;
                     case 2:
                         account_type = "Checkings";
+                        interest_rate = 0.04;
                         break;
                     case 3:
                         account_type = "Passbook";
+                        interest_rate = 0.05;
                         break;
                     default:
                         System.out.println("Invalid choice. Please select again.");
@@ -267,7 +271,7 @@ public class Account {
             try (PreparedStatement statement = con.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, account_type);
                 statement.setDouble(2, initial_deposit);
-                //statement.setDouble(3, interest_rate);
+                statement.setDouble(3, interest_rate);
                 statement.setInt(4, customer_id);
 
                 int rowsAffected = statement.executeUpdate();
@@ -280,7 +284,7 @@ public class Account {
                             System.out.println("New Account ID: " + newAccountId);
                             System.out.println("Account Type: " + account_type);
                             System.out.println("Current Balance: " + initial_deposit);
-                           // System.out.println("Interest Rate: " + interest_rate * 100 + "%");
+                            System.out.println("Interest Rate: " + (interest_rate * 100) + "%");
                         }
                     }
                 }
@@ -292,6 +296,7 @@ public class Account {
             System.out.println("Invalid input. Please enter valid numbers.");
         }
     }
+
 
     public static void showMonthStatementOfAccount(int account_id){
         try (Connection con = DriverManager.getConnection(
