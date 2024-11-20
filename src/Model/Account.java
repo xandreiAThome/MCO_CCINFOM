@@ -83,6 +83,7 @@ public class Account {
         do{
             System.out.println("1 - Deposit to Account\n2 - Withdraw from Account\n3 - Transfer to another Account" +
                     "\n4 - View Statement Of Account");
+            System.out.println("Choose option: ");
             option = Integer.parseInt(UserInput.getScanner().nextLine());
         } while(option < 1 || option > 4);
 
@@ -298,9 +299,9 @@ public class Account {
                 "java",
                 "password")) {
             Calendar cal = Calendar.getInstance();
-            System.out.println("Input year to view: ");
+            System.out.print("Input year to view: ");
             int year = Integer.parseInt(UserInput.getScanner().nextLine());
-            System.out.println("Input month to view: ");
+            System.out.print("Input month to view: ");
             int month = Integer.parseInt(UserInput.getScanner().nextLine());
 
             System.out.println("Statement of Account " +
@@ -349,6 +350,28 @@ public class Account {
                 }
             }
 
+            String transacHistory = "SELECT * FROM transaction_history th\n" +
+                    "WHERE account_id = ?\n" +
+                    "AND MONTH(transaction_date) = MONTH(?)\n" +
+                    "AND YEAR(transaction_date) = YEAR(?)\n" +
+                    "ORDER BY transaction_date;";
+
+            try(PreparedStatement statement = con.prepareStatement(transacHistory)){
+                statement.setInt(1, account_id);
+                java.sql.Date sqlDate = new java.sql.Date(calendar.getTime().getTime());
+                statement.setDate(2, sqlDate);
+                statement.setDate(3, sqlDate);
+
+                System.out.printf("%10s  %-10s  %-9s%n", "Transaction", "Date", "Amount");
+                try(ResultSet res = statement.executeQuery()){
+                    while(res.next()){
+                        String amt = "Php " + res.getDouble("amount");
+                        System.out.printf("%-12s  %-9s  %-9s%n", res.getString("transaction_type"),
+                                 res.getDate("transaction_date"), amt
+                               );
+                    }
+                }
+            }
 
 
         } catch (SQLException e){
