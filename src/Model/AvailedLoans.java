@@ -154,10 +154,9 @@ public class AvailedLoans {
         }
     }
 
-    //TO DO!!! fix wrong first month pay
     public double firstMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm, double roundedPrincipleAmort) {
         double answer;
-        answer = (roundedPrincipleAmort * (loanTerm - 1)) - principalAmount;
+        answer = principalAmount - (roundedPrincipleAmort * (loanTerm - 1));
         return Math.round(answer * 100.0) / 100.0;
     }
 
