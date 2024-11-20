@@ -1,7 +1,6 @@
 package Model;
 import java.sql.*;
 import java.time.LocalDate;
-
 import java.sql.Date;
 import HelperClass.UserInput;
 
@@ -321,6 +320,7 @@ public class AvailedLoans {
                         System.out.println("You've successfully paid for the month!");
                     }
 
+                    TransactionHistory.generateTransactionRecord("Loan Payment", account_id, loan_id, outstandingBal);
                 }
             }
 
