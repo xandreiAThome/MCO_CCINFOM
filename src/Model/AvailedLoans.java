@@ -212,11 +212,24 @@ public class AvailedLoans {
         return Math.round(answer * 100.0) / 100.0;
     }
 
-    public void loanPayment()
+    public void loanPayment(int customer_id){
+        try {
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "java",
+                    "password"
+            );
+
+            String getAmountInfoQuery = "SELECT * FROM availed_loans WHERE customer_id = ? ";
+            PreparedStatement preparedStatementAmountInfo = connection.prepareStatement(getAmountInfoQuery);
+            preparedStatementAmountInfo.setInt(1,customer_id);
+            ResultSet amtInfoResultSet = preparedStatementAmountInfo.executeQuery();
 
 
 
-
-
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
 
 }
