@@ -44,7 +44,7 @@ CREATE TABLE `account` (
 
 LOCK TABLES `account` WRITE;
 /*!40000 ALTER TABLE `account` DISABLE KEYS */;
-INSERT INTO `account` VALUES (1,'savings',12050.00,3000.00,'2024-11-13',0.50,'active',1),(2,'checkings',15010.00,5000.00,'2024-11-19',0.20,'active',1);
+INSERT INTO `account` VALUES (1,'savings',11979.01,3000.00,'2024-11-13',0.50,'active',1),(2,'checkings',15021.00,5000.00,'2024-11-19',0.20,'active',1);
 /*!40000 ALTER TABLE `account` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -60,7 +60,7 @@ CREATE TABLE `availed_loans` (
   `loan_option_id` int NOT NULL,
   `principal_amount` decimal(16,2) NOT NULL,
   `first_month_principal_amortization` decimal(16,2) NOT NULL,
-  `succeding_principal_amortization` decimal(16,2) NOT NULL,
+  `succeeding_principal_amortization` decimal(16,2) NOT NULL,
   `interest_amortization` decimal(16,2) NOT NULL,
   `principal_balance` decimal(16,2) NOT NULL,
   `interest_balance` decimal(16,2) NOT NULL,
@@ -167,7 +167,7 @@ CREATE TABLE `transaction_history` (
   KEY `loan_id_idx` (`loan_id`),
   CONSTRAINT `account_id` FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`),
   CONSTRAINT `loan_id` FOREIGN KEY (`loan_id`) REFERENCES `availed_loans` (`loan_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -176,7 +176,7 @@ CREATE TABLE `transaction_history` (
 
 LOCK TABLES `transaction_history` WRITE;
 /*!40000 ALTER TABLE `transaction_history` DISABLE KEYS */;
-INSERT INTO `transaction_history` VALUES (1,'deposit',10.00,'2024-11-19 00:00:00','success',1,NULL);
+INSERT INTO `transaction_history` VALUES (1,'deposit',10.00,'2024-11-19 00:00:00','success',1,NULL),(2,'deposit',10.00,'2024-11-19 20:49:55','success',1,NULL),(3,'withdrawal',10.00,'2024-11-19 20:53:20','success',1,NULL),(6,'deposit',1.00,'2024-11-19 20:55:26','success',2,NULL),(7,'transfer',1.00,'2024-11-19 20:55:26','success',1,NULL),(8,'deposit',0.01,'2024-11-19 20:56:25','success',1,NULL);
 /*!40000 ALTER TABLE `transaction_history` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -189,4 +189,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-19 20:46:17
+-- Dump completed on 2024-11-20 17:22:41
