@@ -11,6 +11,7 @@ public class AvailedLoans {
         ACTIVE,
         CLOSED
     }
+
     public void loanAppli(int customer_id){
         try {
             Connection connection = DriverManager.getConnection(
@@ -69,13 +70,13 @@ public class AvailedLoans {
                     double loanPrin;
                     do {
 
-                        //System.out.println("Max = " + max);  TEST
-                        //System.out.println("Min = " + min);   TEST
+                        //System.out.println("TEST Max = " + max);
+                        //System.out.println("TEST Min = " + min);
 
                         System.out.print("Enter the amount you want to loan: ");
                         loanPrin = Double.parseDouble(UserInput.getScanner().nextLine());
 
-                        //System.out.println("loanPrin = " + loanPrin);  TEST
+                        //System.out.println("TEST loanPrin = " + loanPrin);
 
                         if (loanPrin < min || loanPrin > max) {
                             System.out.println("Invalid choice. Please select an amount between " + min +  "and " + max + ".");
@@ -99,10 +100,12 @@ public class AvailedLoans {
                         money = moneyResult.getDouble("current_balance");
                     }
 
-                    System.out.println("TEST Principle Amort = " + principleAmort);
-                    System.out.println("First Month Pay = " + firstMonthPay);
+                    double interestAmort = interest_amortization(loanPrin,loanTerm,interestRate);
+                    //System.out.println("TEST Principle Amort = " + principleAmort);
+                    //System.out.println("TEST First Month Pay = " + firstMonthPay);
+                    //System.out.println("TEST Interest Amortization = " + interestAmort);
 
-                    double sufficientBalChecker = principleAmort + firstMonthPay;
+                    double sufficientBalChecker = principleAmort + interestAmort + firstMonthPay + interestAmort;
                     //System.out.println("TEST Money = " + money);
                     //System.out.println("TEST Sufficient Bal Checker = " + sufficientBalChecker);
                     if (money >= sufficientBalChecker){
@@ -129,8 +132,8 @@ public class AvailedLoans {
 
                         LoanStatus status = LoanStatus.ACTIVE;
 
-                        preparedStatementInput.setString(11, status.name());
-                        preparedStatementInput.setInt(12, customer_id);
+                        preparedStatementInput.setString(10, status.name());
+                        preparedStatementInput.setInt(11, customer_id);
 
                         int rowsInserted = preparedStatementInput.executeUpdate();
                         if (rowsInserted > 0) {
