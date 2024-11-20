@@ -103,8 +103,8 @@ public class AvailedLoans {
                     System.out.println("First Month Pay = " + firstMonthPay);
 
                     double sufficientBalChecker = principleAmort + firstMonthPay;
-                    //System.out.println("Money = " + money);  TEST
-                    //System.out.println("Sufficient Bal Checker = " + sufficientBalChecker);  TEST
+                    //System.out.println("TEST Money = " + money);
+                    //System.out.println("TEST Sufficient Bal Checker = " + sufficientBalChecker);
                     if (money >= sufficientBalChecker){
 
                         System.out.println("Approved!");
@@ -154,6 +154,7 @@ public class AvailedLoans {
         }
     }
 
+
     public double firstMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm, double roundedPrincipleAmort) {
         double answer;
         answer = principalAmount - (roundedPrincipleAmort * (loanTerm - 1));
@@ -162,13 +163,13 @@ public class AvailedLoans {
 
     public double succMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm) {
         double answer;
-        answer = (int) Math.floor(principalAmount / loanTerm);
+        answer = principalAmount / loanTerm;
         return Math.round(answer * 100.0) / 100.0;
     }
 
     public double interest_amortization(double principalAmount, int loanTerm, double interestRate) {
         double answer;
-        answer=(principalAmount * interestRate / 100) / loanTerm;
+        answer=(principalAmount * interestRate) / loanTerm;
         return Math.round(answer * 100.0) / 100.0;
     }
 
