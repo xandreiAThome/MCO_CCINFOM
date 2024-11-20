@@ -27,9 +27,6 @@ public class Main {
                     EmployeeOptions.showOptions();
                     break;
                 case 3:
-                    AvailedLoans trialLoanAppli = new AvailedLoans();
-                    trialLoanAppli.loanAppli(1);
-                    
                     stop = true;
                     System.out.println("Exited the app");
                     break;
