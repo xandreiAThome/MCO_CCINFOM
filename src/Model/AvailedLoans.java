@@ -226,6 +226,7 @@ public class AvailedLoans {
         double currentMoney = 0;
         double accountMinBal = 0;
         double outstandingBal;
+        LoanStatus loanStatus;
 
         try {
             Connection connection = DriverManager.getConnection(
@@ -296,7 +297,29 @@ public class AvailedLoans {
                 if (currentMoney - outstandingBal < accountMinBal){
                     System.out.println("Insufficient funds you will be exceeding the minimum required balance...going back to the main menu");
                 } else {
-                    System.out.println("You've successfully paid for the month!");
+                    String updateAvailedLoansQuery = "UPDATE availed_loans"
+                            + "SET principal_balance = ?, interest_balance = ?, loan_status = ?"
+                            + "WHERE loan_id = ?";
+
+                    principleBal = principleBal - monthPayment;
+                    interestBal = interestBal - interestAmort;
+
+                    if (principleBal + interestBal == 0){
+                        loanStatus = LoanStatus.CLOSED;
+                    } else {
+                        loanStatus = LoanStatus.ACTIVE;
+                    }
+
+                    PreparedStatement preparedStatementUpdate = connection.prepareStatement(updateAvailedLoansQuery);
+                    preparedStatementUpdate.setDouble(1,principleBal);
+                    preparedStatementUpdate.setDouble(2,interestBal);
+                    preparedStatementUpdate.setString(3,loanStatus.name());
+                    preparedStatementUpdate.setInt(4,loan_id);
+
+                    int rowsInserted = preparedStatementUpdate.executeUpdate();
+                    if (rowsInserted > 0) {
+                        System.out.println("You've successfully paid for the month!");
+                    }
 
                 }
             }
