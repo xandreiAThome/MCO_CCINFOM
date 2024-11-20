@@ -32,7 +32,7 @@ public class AvailedLoans {
                 System.out.println("Loan Option Id: " + infoResultSet.getInt("loan_option_id"));
                 System.out.println("Principle Amount: " + infoResultSet.getDouble("principal_amount"));
                 System.out.println("Principle Amortization: " + infoResultSet.getDouble("first_month_principal_amortization"));
-                System.out.println("Succeeding Principal Amortization: " + infoResultSet.getDouble("succeding_principal_amortization"));
+                System.out.println("Succeeding Principal Amortization: " + infoResultSet.getDouble("succeeding_principal_amortization"));
                 System.out.println("Interest Amortization: " + infoResultSet.getDouble("interest_amortization"));
                 System.out.println("Principle Balance: " + infoResultSet.getDouble("principal_balance"));
                 System.out.println("Interest Balance: " + infoResultSet.getDouble("interest_balance"));
@@ -149,7 +149,7 @@ public class AvailedLoans {
                         System.out.println("Approved!");
 
                         String newApplicationQuery = "INSERT INTO availed_loans "
-                                + "(loan_option_id, principal_amount, first_month_principal_amortization, succeding_principal_amortization,interest_amortization,principal_balance,interest_balance,start_date,end_date,month_payment_day,loan_status,customer_id) "
+                                + "(loan_option_id, principal_amount, first_month_principal_amortization, succeeding_principal_amortization,interest_amortization,principal_balance,interest_balance,start_date,end_date,month_payment_day,loan_status,customer_id) "
                                 + "VALUES (?,?,?,?,?,?,?,?,?,20,?,?)";
                         PreparedStatement preparedStatementInput = connection.prepareStatement(newApplicationQuery);
                         preparedStatementInput.setInt(1,chosenLoan);
@@ -225,6 +225,7 @@ public class AvailedLoans {
         double monthPayment;
         double currentMoney = 0;
         double accountMinBal = 0;
+        double outstandingBal;
 
         try {
             Connection connection = DriverManager.getConnection(
@@ -251,7 +252,7 @@ public class AvailedLoans {
                 startDate = amtInfoResultSet.getDate("start_date");
                 endDate = amtInfoResultSet.getDate("end_date");
                 firstMonthAmort = amtInfoResultSet.getDouble("first_month_principal_amortization");
-                monthlyAmort = amtInfoResultSet.getDouble("succeding_principal_amortization");
+                monthlyAmort = amtInfoResultSet.getDouble("succeeding_principal_amortization");
                 interestAmort = amtInfoResultSet.getDouble("interest_amortization");
                 principleBal = amtInfoResultSet.getDouble("principal_balance");
                 interestBal = amtInfoResultSet.getDouble("interest_balance");
@@ -269,10 +270,11 @@ public class AvailedLoans {
                 monthPayment = monthlyAmort;
             }
 
+            outstandingBal = monthPayment + interestAmort;
             System.out.println("---BREAKDOWN---");
             System.out.println("Amortization for the Current Month: " + monthPayment);
             System.out.println("Monthly Interest Amortization: " + interestAmort);
-            System.out.println("Outstanding Balance for the Month: " + monthPayment + interestAmort);
+            System.out.println("Outstanding Balance for the Month: " + outstandingBal);
 
             System.out.println("Select Account to Pay ");
             System.out.println("Enter Account ID: ");
@@ -286,6 +288,17 @@ public class AvailedLoans {
             if (moneyResultSet.next()){
                 currentMoney = moneyResultSet.getDouble("current_balance");
                 accountMinBal = moneyResultSet.getDouble("minimum_balance");
+            }
+
+            if (currentMoney < outstandingBal){
+                System.out.println("Insufficient funds...going back to the main menu");
+            } else {
+                if (currentMoney - outstandingBal < accountMinBal){
+                    System.out.println("Insufficient funds you will be exceeding the minimum required balance...going back to the main menu");
+                } else {
+                    System.out.println("You've successfully paid for the month!");
+
+                }
             }
 
 
