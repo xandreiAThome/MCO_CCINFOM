@@ -212,6 +212,8 @@ public class AvailedLoans {
         return Math.round(answer * 100.0) / 100.0;
     }
 
+    public void loanPayment()
+
 
 
 
