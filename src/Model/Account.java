@@ -4,8 +4,12 @@ import HelperClass.UserInput;
 
 import javax.xml.transform.Result;
 import java.sql.*;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class Account {
     private int account_id;
@@ -77,9 +81,10 @@ public class Account {
 
         int option;
         do{
-            System.out.println("1 - Deposit to Account\n2 - Withdraw from Account\n3 - Transfer to another Account");
+            System.out.println("1 - Deposit to Account\n2 - Withdraw from Account\n3 - Transfer to another Account" +
+                    "\n4 - View Statement Of Account");
             option = Integer.parseInt(UserInput.getScanner().nextLine());
-        } while(option < 1 || option > 3);
+        } while(option < 1 || option > 4);
 
         switch (option){
             case 1:
@@ -90,6 +95,9 @@ public class Account {
                 break;
             case 3:
                 transferToAnother(account_id);
+                break;
+            case 4:
+                showMonthStatementOfAccount(account_id);
                 break;
         }
 
@@ -281,6 +289,70 @@ public class Account {
             e.printStackTrace();
         } catch (NumberFormatException e) {
             System.out.println("Invalid input. Please enter valid numbers.");
+        }
+    }
+
+    public static void showMonthStatementOfAccount(int account_id){
+        try (Connection con = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/bankdb",
+                "java",
+                "password")) {
+            Calendar cal = Calendar.getInstance();
+            System.out.println("Input year to view: ");
+            int year = Integer.parseInt(UserInput.getScanner().nextLine());
+            System.out.println("Input month to view: ");
+            int month = Integer.parseInt(UserInput.getScanner().nextLine());
+
+            System.out.println("Statement of Account " +
+                    new DateFormatSymbols().getMonths()[month-1] + " " + year);
+
+            Calendar calendar = GregorianCalendar.getInstance();
+            calendar.set(Calendar.MONTH, month - 1);
+            calendar.set(Calendar.YEAR, year);
+
+            String outgoing = "SELECT SUM(amount) FROM transaction_history th\n" +
+                    "WHERE (transaction_type = \"withdrawal\" OR transaction_type = \"transfer\") AND account_id = ?\n" +
+                    "AND MONTH(transaction_date) = MONTH(?)" +
+                    "AND YEAR(transaction_date) = YEAR(?);";
+
+            String incoming = "SELECT SUM(amount) FROM transaction_history th\n" +
+                    "WHERE transaction_type = \"deposit\" AND account_id = ?\n" +
+                    "AND MONTH(transaction_date) = MONTH(?)" +
+                    "AND YEAR(transaction_date) = YEAR(?);";
+
+            try(PreparedStatement statement = con.prepareStatement(outgoing)){
+                statement.setInt(1, account_id);
+                java.sql.Date sqlDate = new java.sql.Date(calendar.getTime().getTime());
+                statement.setDate(2, sqlDate);
+                statement.setDate(3, sqlDate);
+                System.out.println(sqlDate);
+
+
+                try(ResultSet res = statement.executeQuery()){
+                    if(res.next()){
+                        System.out.println("Outgoing: Php " + res.getDouble(1));
+                    }
+                }
+            }
+
+            try(PreparedStatement statement = con.prepareStatement(incoming)){
+                statement.setInt(1, account_id);
+                java.sql.Date sqlDate = new java.sql.Date(calendar.getTime().getTime());
+                statement.setDate(2, sqlDate);
+                statement.setDate(3, sqlDate);
+
+
+                try(ResultSet res = statement.executeQuery()){
+                    if(res.next()){
+                        System.out.println("Incoming: Php " + res.getDouble(1));
+                    }
+                }
+            }
+
+
+
+        } catch (SQLException e){
+            e.printStackTrace();
         }
     }
 
