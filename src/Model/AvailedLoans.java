@@ -12,6 +12,42 @@ public class AvailedLoans {
         CLOSED
     }
 
+    public void showAvailedLoans (int customer_id){
+        try {
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "java",
+                    "password"
+            );
+
+            String getInfoQuery = "SELECT * FROM availed_loans WHERE customer_id = ?";
+            PreparedStatement preparedStatementInfo = connection.prepareStatement(getInfoQuery);
+            preparedStatementInfo.setInt(1, customer_id);
+            ResultSet infoResultSet = preparedStatementInfo.executeQuery();
+
+            System.out.println("Your Availed Loans: ");
+            while(infoResultSet.next()){
+                System.out.println("------------------------------------------------------");
+                System.out.println("Loan Id: " + infoResultSet.getInt("loan_id"));
+                System.out.println("Loan Option Id: " + infoResultSet.getInt("loan_option_id"));
+                System.out.println("Principle Amount: " + infoResultSet.getDouble("principal_amount"));
+                System.out.println("Principle Amortization: " + infoResultSet.getDouble("first_month_principal_amortization"));
+                System.out.println("Succeeding Principal Amortization: " + infoResultSet.getDouble("succeding_principal_amortization"));
+                System.out.println("Interest Amortization: " + infoResultSet.getDouble("interest_amortization"));
+                System.out.println("Principle Balance: " + infoResultSet.getDouble("principal_balance"));
+                System.out.println("Interest Balance: " + infoResultSet.getDouble("interest_balance"));
+                System.out.println("Start Date: " + infoResultSet.getDate("start_date"));
+                System.out.println("End Date: " + infoResultSet.getDate("end_date"));
+                System.out.println("Monthly Payment Day: " + infoResultSet.getInt("month_payment_day"));
+                System.out.println("Loan Status: " + infoResultSet.getString("loan_status"));
+                System.out.println("------------------------------------------------------");
+            }
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
     public void loanAppli(int customer_id){
         try {
             Connection connection = DriverManager.getConnection(
