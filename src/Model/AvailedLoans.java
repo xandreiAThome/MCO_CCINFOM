@@ -225,7 +225,7 @@ public class AvailedLoans {
         double monthPayment;
         double currentMoney = 0;
         double accountMinBal = 0;
-        double outstandingBal = 0;
+        double outstandingBal;
 
         try {
             Connection connection = DriverManager.getConnection(
