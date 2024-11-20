@@ -1,6 +1,8 @@
 package Model;
 import java.sql.*;
-import DateClass.Date;
+import java.time.LocalDate;
+
+import java.sql.Date;
 import HelperClass.UserInput;
 
 public class AvailedLoans {
@@ -9,23 +11,41 @@ public class AvailedLoans {
         ACTIVE,
         CLOSED
     }
-    
-    private int loan_id;
-    private int loan_option_id;
-    private double principle_amount;
-    private double first_month_principal_amortization;
-    private double succeding_principal_amortization;
-    private double interest_amortization;
-    private double prinicple_balance;
-    private double interest_balance;
-    private Date start_date;
-    private Date end_date;
-    private Date month_payment_day;
-    private LoanStatus loan_status;
-    private int customer_id;
 
-    public void viewLoans(int customer_id){
+    public void showAvailedLoans (int customer_id){
+        try {
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "java",
+                    "password"
+            );
 
+            String getInfoQuery = "SELECT * FROM availed_loans WHERE customer_id = ?";
+            PreparedStatement preparedStatementInfo = connection.prepareStatement(getInfoQuery);
+            preparedStatementInfo.setInt(1, customer_id);
+            ResultSet infoResultSet = preparedStatementInfo.executeQuery();
+
+            System.out.println("Your Availed Loans: ");
+            while(infoResultSet.next()){
+                System.out.println("------------------------------------------------------");
+                System.out.println("Loan Id: " + infoResultSet.getInt("loan_id"));
+                System.out.println("Loan Option Id: " + infoResultSet.getInt("loan_option_id"));
+                System.out.println("Principle Amount: " + infoResultSet.getDouble("principal_amount"));
+                System.out.println("Principle Amortization: " + infoResultSet.getDouble("first_month_principal_amortization"));
+                System.out.println("Succeeding Principal Amortization: " + infoResultSet.getDouble("succeding_principal_amortization"));
+                System.out.println("Interest Amortization: " + infoResultSet.getDouble("interest_amortization"));
+                System.out.println("Principle Balance: " + infoResultSet.getDouble("principal_balance"));
+                System.out.println("Interest Balance: " + infoResultSet.getDouble("interest_balance"));
+                System.out.println("Start Date: " + infoResultSet.getDate("start_date"));
+                System.out.println("End Date: " + infoResultSet.getDate("end_date"));
+                System.out.println("Monthly Payment Day: " + infoResultSet.getInt("month_payment_day"));
+                System.out.println("Loan Status: " + infoResultSet.getString("loan_status"));
+                System.out.println("------------------------------------------------------");
+            }
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
     }
 
     public void loanAppli(int customer_id){
@@ -83,10 +103,17 @@ public class AvailedLoans {
 
                     }
 
-                    double loanPrin = 0;
+                    double loanPrin;
                     do {
+
+                        //System.out.println("TEST Max = " + max);
+                        //System.out.println("TEST Min = " + min);
+
                         System.out.print("Enter the amount you want to loan: ");
                         loanPrin = Double.parseDouble(UserInput.getScanner().nextLine());
+
+                        //System.out.println("TEST loanPrin = " + loanPrin);
+
                         if (loanPrin < min || loanPrin > max) {
                             System.out.println("Invalid choice. Please select an amount between " + min +  "and " + max + ".");
                         }
@@ -100,7 +127,7 @@ public class AvailedLoans {
                     accountUse = Integer.parseInt(UserInput.getScanner().nextLine());
 
                     String customerMoney = "SELECT * FROM account WHERE account_id = ?";
-                    PreparedStatement prepStmtMoney = connection.prepareStatement(checkIDQuery);
+                    PreparedStatement prepStmtMoney = connection.prepareStatement(customerMoney);
                     prepStmtMoney.setInt(1, accountUse);
                     ResultSet moneyResult = prepStmtMoney.executeQuery();
 
@@ -109,21 +136,46 @@ public class AvailedLoans {
                         money = moneyResult.getDouble("current_balance");
                     }
 
-                    double sufficientBalChecker = principleAmort + firstMonthPay;
-                    int paymentDay;
+                    double interestAmort = interest_amortization(loanPrin,loanTerm,interestRate);
+                    //System.out.println("TEST Principle Amort = " + principleAmort);
+                    //System.out.println("TEST First Month Pay = " + firstMonthPay);
+                    //System.out.println("TEST Interest Amortization = " + interestAmort);
+
+                    double sufficientBalChecker = principleAmort + interestAmort + firstMonthPay + interestAmort;
+                    //System.out.println("TEST Money = " + money);
+                    //System.out.println("TEST Sufficient Bal Checker = " + sufficientBalChecker);
                     if (money >= sufficientBalChecker){
-                        do {
-                            System.out.print("Payment day: ");
-                            paymentDay = Integer.parseInt(UserInput.getScanner().nextLine());
-                            if (paymentDay < 1 || paymentDay > 30) {
-                                System.out.println("Invalid choice. Please select an amount between 1 and 30.");
-                            }
-                        } while (paymentDay < 1 || paymentDay > 30);
+
+                        System.out.println("Approved!");
 
                         String newApplicationQuery = "INSERT INTO availed_loans "
                                 + "(loan_option_id, principal_amount, first_month_principal_amortization, succeding_principal_amortization,interest_amortization,principal_balance,interest_balance,start_date,end_date,month_payment_day,loan_status,customer_id) "
-                                + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+                                + "VALUES (?,?,?,?,?,?,?,?,?,20,?,?)";
                         PreparedStatement preparedStatementInput = connection.prepareStatement(newApplicationQuery);
+                        preparedStatementInput.setInt(1,chosenLoan);
+                        preparedStatementInput.setDouble(2,loanPrin);
+                        preparedStatementInput.setDouble(3,firstMonthPay);
+                        preparedStatementInput.setDouble(4,principleAmort);
+                        preparedStatementInput.setDouble(5,interestAmort);
+                        preparedStatementInput.setDouble(6,loanPrin);
+                        preparedStatementInput.setDouble(7, interestAmort*loanTerm);
+
+                        LocalDate currentDate = LocalDate.now();
+                        LocalDate endDate = currentDate.plusMonths(loanTerm);
+
+                        preparedStatementInput.setDate(8, Date.valueOf(currentDate));//Start date
+                        preparedStatementInput.setDate(9, Date.valueOf(endDate));//end date
+
+                        LoanStatus status = LoanStatus.ACTIVE;
+
+                        preparedStatementInput.setString(10, status.name());
+                        preparedStatementInput.setInt(11, customer_id);
+
+                        int rowsInserted = preparedStatementInput.executeUpdate();
+                        if (rowsInserted > 0) {
+                            System.out.println("New loan application inserted successfully.");
+                        }
+
                     } else {
                         System.out.println("Insufficient Funds... Going back to the Main Menu");
                     }
@@ -141,27 +193,116 @@ public class AvailedLoans {
         }
     }
 
+
     public double firstMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm, double roundedPrincipleAmort) {
-        double answer =0;
-        answer = (roundedPrincipleAmort * (loanTerm - 1)) - principalAmount;
-        return answer;
+        double answer;
+        answer = principalAmount - (roundedPrincipleAmort * (loanTerm - 1));
+        return Math.round(answer * 100.0) / 100.0;
     }
 
     public double succMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm) {
-        double answer =0;
-        answer = (int) Math.floor((double) principalAmount / loanTerm);
-        return answer;
+        double answer;
+        answer = principalAmount / loanTerm;
+        return Math.round(answer * 100.0) / 100.0;
     }
 
     public double interest_amortization(double principalAmount, int loanTerm, double interestRate) {
-        double answer =0;
-        answer=(principalAmount * interestRate / 100) / loanTerm;
-        return answer;
+        double answer;
+        answer=(principalAmount * interestRate) / loanTerm;
+        return Math.round(answer * 100.0) / 100.0;
     }
 
+    public void loanPayment(int customer_id){
+
+        Date startDate;
+        Date endDate;
+        double firstMonthAmort = 0;
+        double monthlyAmort = 0;
+        double interestAmort = 0;
+        double principleBal = 0;
+        double interestBal = 0;
+        boolean monthChecker = false;
+        double monthPayment;
+        double currentMoney = 0;
+        double accountMinBal = 0;
+
+        try {
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "java",
+                    "password"
+            );
+
+            showAvailedLoans(customer_id);
+            System.out.println("Select which loan to pay ");
+            System.out.println("Enter Loan ID: ");
+            int loan_id = Integer.parseInt(UserInput.getScanner().nextLine());
+
+            String getAmountInfoQuery = "SELECT * FROM availed_loans WHERE loan_id = ? ";
+            PreparedStatement preparedStatementAmountInfo = connection.prepareStatement(getAmountInfoQuery);
+            preparedStatementAmountInfo.setInt(1,loan_id);
+            ResultSet amtInfoResultSet = preparedStatementAmountInfo.executeQuery();
+
+            LocalDate currentDate = LocalDate.now();
+
+            //Check current date compare to date of start if start date then print the first month amort if not show succeeding
+
+            if (amtInfoResultSet.next()){
+                startDate = amtInfoResultSet.getDate("start_date");
+                endDate = amtInfoResultSet.getDate("end_date");
+                firstMonthAmort = amtInfoResultSet.getDouble("first_month_principal_amortization");
+                monthlyAmort = amtInfoResultSet.getDouble("succeding_principal_amortization");
+                interestAmort = amtInfoResultSet.getDouble("interest_amortization");
+                principleBal = amtInfoResultSet.getDouble("principal_balance");
+                interestBal = amtInfoResultSet.getDouble("interest_balance");
+
+                if (startDate.getMonth() + 1 == currentDate.getMonthValue()){
+                    monthChecker = true;
+                }
+            }
+
+            if (monthChecker){
+                System.out.println("This will be your first month paying");
+                monthPayment = firstMonthAmort;
+
+            } else {
+                monthPayment = monthlyAmort;
+            }
+
+            System.out.println("---BREAKDOWN---");
+            System.out.println("Amortization for the Current Month: " + monthPayment);
+            System.out.println("Monthly Interest Amortization: " + interestAmort);
+            System.out.println("Outstanding Balance for the Month: " + monthPayment + interestAmort);
+
+            System.out.println("Select Account to Pay ");
+            System.out.println("Enter Account ID: ");
+            int account_id = Integer.parseInt(UserInput.getScanner().nextLine());
+
+            String moneyCheckQuery = "SELECT * FROM account WHERE account_id = ?";
+            PreparedStatement preparedStatementMoneyQuery = connection.prepareStatement(moneyCheckQuery);
+            preparedStatementMoneyQuery.setInt(1,account_id);
+            ResultSet moneyResultSet = preparedStatementMoneyQuery.executeQuery();
+
+            if (moneyResultSet.next()){
+                currentMoney = moneyResultSet.getDouble("current_balance");
+                accountMinBal = moneyResultSet.getDouble("minimum_balance");
+            }
+
+
+            //Check if current balance is enough
+            //Check if it will exceed the minimum balance
+            //If both will not work then say need to add more money and going to main menu...
+            //Then if all checks out deduct from everything from accounts table and availed loan table
+            //Then check the date if current date is the same as the end date then change status to closed
+            //update transaction history
+            //Then done
 
 
 
 
+        } catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
 
 }
