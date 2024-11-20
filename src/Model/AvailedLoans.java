@@ -225,6 +225,7 @@ public class AvailedLoans {
         double monthPayment;
         double currentMoney = 0;
         double accountMinBal = 0;
+        double outstandingBal = 0;
 
         try {
             Connection connection = DriverManager.getConnection(
@@ -269,10 +270,11 @@ public class AvailedLoans {
                 monthPayment = monthlyAmort;
             }
 
+            outstandingBal = monthPayment + interestAmort;
             System.out.println("---BREAKDOWN---");
             System.out.println("Amortization for the Current Month: " + monthPayment);
             System.out.println("Monthly Interest Amortization: " + interestAmort);
-            System.out.println("Outstanding Balance for the Month: " + monthPayment + interestAmort);
+            System.out.println("Outstanding Balance for the Month: " + outstandingBal);
 
             System.out.println("Select Account to Pay ");
             System.out.println("Enter Account ID: ");
@@ -286,6 +288,17 @@ public class AvailedLoans {
             if (moneyResultSet.next()){
                 currentMoney = moneyResultSet.getDouble("current_balance");
                 accountMinBal = moneyResultSet.getDouble("minimum_balance");
+            }
+
+            if (currentMoney < outstandingBal){
+                System.out.println("Insufficient funds...going back to the main menu");
+            } else {
+                if (currentMoney - outstandingBal < accountMinBal){
+                    System.out.println("Insufficient funds you will be exceeding the minimum required balance...going back to the main menu");
+                } else {
+                    System.out.println("You've successfully paid for the month!");
+
+                }
             }
 
 
