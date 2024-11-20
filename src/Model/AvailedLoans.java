@@ -294,6 +294,7 @@ public class AvailedLoans {
             //If both will not work then say need to add more money and going to main menu...
             //Then if all checks out deduct from everything from accounts table and availed loan table
             //Then check the date if current date is the same as the end date then change status to closed
+            //update transaction history
             //Then done
 
 
