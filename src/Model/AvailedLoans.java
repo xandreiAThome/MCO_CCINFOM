@@ -238,7 +238,7 @@ public class AvailedLoans {
 
             showAvailedLoans(customer_id);
             System.out.println("Select which loan to pay ");
-            System.out.println("Enter Loan ID: ");
+            System.out.print("Enter Loan ID: ");
             int loan_id = Integer.parseInt(UserInput.getScanner().nextLine());
 
             String getAmountInfoQuery = "SELECT * FROM availed_loans WHERE loan_id = ? ";
