@@ -226,6 +226,8 @@ public class AvailedLoans {
         double accountMinBal = 0;
         double outstandingBal;
         LoanStatus loanStatus;
+        int account_id;
+        double accountDeduction = 0;
 
         try {
             Connection connection = DriverManager.getConnection(
@@ -277,8 +279,8 @@ public class AvailedLoans {
             System.out.println("Outstanding Balance for the Month: " + outstandingBal);
 
             System.out.println("Select Account to Pay ");
-            System.out.println("Enter Account ID: ");
-            int account_id = Integer.parseInt(UserInput.getScanner().nextLine());
+            System.out.print("Enter Account ID: ");
+            account_id = Integer.parseInt(UserInput.getScanner().nextLine());
 
             String moneyCheckQuery = "SELECT * FROM account WHERE account_id = ?";
             PreparedStatement preparedStatementMoneyQuery = connection.prepareStatement(moneyCheckQuery);
@@ -296,7 +298,7 @@ public class AvailedLoans {
                 if (currentMoney - outstandingBal < accountMinBal){
                     System.out.println("Insufficient funds you will be exceeding the minimum required balance...going back to the main menu");
                 } else {
-                    String updateAvailedLoansQuery = "UPDATE availed_loans"
+                    String updateAvailedLoansQuery = "UPDATE availed_loans "
                             + "SET principal_balance = ?, interest_balance = ?, loan_status = ?"
                             + "WHERE loan_id = ?";
 
@@ -320,7 +322,20 @@ public class AvailedLoans {
                         System.out.println("You've successfully paid for the month!");
                     }
 
-                    TransactionHistory.generateTransactionRecord("Loan Payment", account_id, loan_id, outstandingBal);
+                    String updateAccountQuery = "UPDATE account "
+                            + "SET current_balance = ? "
+                            + "WHERE account_id = ?";
+                    accountDeduction = currentMoney - outstandingBal;
+
+                    PreparedStatement preparedStatementUpdate2 = connection.prepareStatement(updateAccountQuery);
+                    preparedStatementUpdate2.setDouble(1, accountDeduction);
+                    preparedStatementUpdate2.setDouble(2, account_id);
+                    int rowsInserted2 = preparedStatementUpdate2.executeUpdate();
+                    if (rowsInserted2 > 0) {
+                        System.out.println("Successfully deducted from your account");
+                    }
+
+                    TransactionHistory.generateTransactionRecord("loan_payment", account_id, loan_id, outstandingBal);
                 }
             }
 
