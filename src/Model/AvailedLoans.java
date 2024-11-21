@@ -29,12 +29,12 @@ public class AvailedLoans {
                 System.out.println("------------------------------------------------------");
                 System.out.println("Loan Id: " + infoResultSet.getInt("loan_id"));
                 System.out.println("Loan Option Id: " + infoResultSet.getInt("loan_option_id"));
-                System.out.println("Principle Amount: " + infoResultSet.getDouble("principal_amount"));
-                System.out.println("Principle Amortization: " + infoResultSet.getDouble("first_month_principal_amortization"));
-                System.out.println("Succeeding Principal Amortization: " + infoResultSet.getDouble("succeeding_principal_amortization"));
-                System.out.println("Interest Amortization: " + infoResultSet.getDouble("interest_amortization"));
-                System.out.println("Principle Balance: " + infoResultSet.getDouble("principal_balance"));
-                System.out.println("Interest Balance: " + infoResultSet.getDouble("interest_balance"));
+                System.out.println("Principle Amount: ₱" + infoResultSet.getDouble("principal_amount"));
+                System.out.println("Principle Amortization: ₱" + infoResultSet.getDouble("first_month_principal_amortization"));
+                System.out.println("Succeeding Principal Amortization: ₱" + infoResultSet.getDouble("succeeding_principal_amortization"));
+                System.out.println("Interest Amortization: ₱" + infoResultSet.getDouble("interest_amortization"));
+                System.out.println("Principle Balance: ₱" + infoResultSet.getDouble("principal_balance"));
+                System.out.println("Interest Balance: ₱" + infoResultSet.getDouble("interest_balance"));
                 System.out.println("Start Date: " + infoResultSet.getDate("start_date"));
                 System.out.println("End Date: " + infoResultSet.getDate("end_date"));
                 System.out.println("Monthly Payment Day: " + infoResultSet.getInt("month_payment_day"));
@@ -274,9 +274,9 @@ public class AvailedLoans {
 
             outstandingBal = monthPayment + interestAmort;
             System.out.println("---BREAKDOWN---");
-            System.out.println("Amortization for the Current Month: " + monthPayment);
-            System.out.println("Monthly Interest Amortization: " + interestAmort);
-            System.out.println("Outstanding Balance for the Month: " + outstandingBal);
+            System.out.println("Amortization for the Current Month: ₱" + monthPayment);
+            System.out.println("Monthly Interest Amortization: ₱" + interestAmort);
+            System.out.println("Outstanding Balance for the Month: ₱" + outstandingBal);
 
             System.out.println("Select Account to Pay ");
             System.out.print("Enter Account ID: ");
@@ -340,13 +340,8 @@ public class AvailedLoans {
             }
 
 
-            //Check if current balance is enough
-            //Check if it will exceed the minimum balance
-            //If both will not work then say need to add more money and going to main menu...
-            //Then if all checks out deduct from everything from accounts table and availed loan table
-            //Then check the date if current date is the same as the end date then change status to closed
-            //update transaction history
-            //Then done
+           //Check if they already paid for the moth
+            // Add late payment solution
 
 
 

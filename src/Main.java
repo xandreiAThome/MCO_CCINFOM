@@ -28,6 +28,8 @@ public class Main {
                     EmployeeOptions.showOptions();
                     break;
                 case 3:
+                    TransactionHistory transactionHistory = new TransactionHistory();
+                    transactionHistory.generateAnnualLoanPayment("2024");
                     stop = true;
                     System.out.println("Exited the app");
                     break;
