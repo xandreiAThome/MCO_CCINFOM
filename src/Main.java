@@ -27,10 +27,6 @@ public class Main {
                     EmployeeOptions.showOptions();
                     break;
                 case 3:
-                    AvailedLoans applyLoan = new AvailedLoans();
-                    //applyLoan.loanAppli(1);
-                    //applyLoan.showAvailedLoans(1);
-                    applyLoan.loanPayment(1);
                     stop = true;
                     System.out.println("Exited the app");
                     break;
