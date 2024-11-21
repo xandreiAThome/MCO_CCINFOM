@@ -48,4 +48,40 @@ public class TransactionHistory {
             e.printStackTrace();
         }
     }
+
+    public void generateDailyTransaction(String dateToGenerate){
+
+        double totalOutgoing = 0;
+        double totalIncoming = 0;
+        try {
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "java",
+                    "password"
+            );
+
+            String getDayReportQuery = "SELECT * FROM transaction_history WHERE DATE(transaction_date) = ? ";
+            PreparedStatement preparedStatement = connection.prepareStatement(getDayReportQuery);
+            preparedStatement.setString(1, dateToGenerate);
+            ResultSet reportResult = preparedStatement.executeQuery();
+
+            System.out.println("Transaction for that day:");
+            while (reportResult.next()){
+                System.out.println("------------------------------------------------------");
+                System.out.println("Account ID: " + reportResult.getInt("account_id"));
+                System.out.println("Transaction Id: " + reportResult.getInt("transaction_id"));
+                System.out.println("Transaction Type: " + reportResult.getString("transaction_type"));
+                System.out.println("Transaction Amount: " + reportResult.getDouble("amount"));
+                System.out.println("Transaction Id: " + reportResult.getDate("transaction_date"));
+                System.out.println("Transaction Status: " + reportResult.getString("transaction_status"));
+                System.out.println("------------------------------------------------------");
+            }
+
+            System.out.println("Total Outgoing: " + totalOutgoing);
+            System.out.println("Total Incoming: " + totalIncoming);
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
 }

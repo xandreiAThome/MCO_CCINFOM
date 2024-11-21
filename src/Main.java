@@ -3,6 +3,7 @@
 
 import Model.AvailedLoans;
 import Model.LoanOptions;
+import Model.TransactionHistory;
 import View.BankWindow;
 import View.CustomerOptions;
 import View.EmployeeOptions;
