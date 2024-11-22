@@ -285,7 +285,6 @@ public class Account {
                             System.out.println("New Account ID: " + newAccountId);
                             System.out.println("Account Type: " + account_type);
                             System.out.println("Current Balance: " + initial_deposit);
-                            System.out.println("Interest Rate: " + (interest_rate * 100) + "%");
                         }
                     }
                 }
