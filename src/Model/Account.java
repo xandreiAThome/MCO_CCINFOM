@@ -69,15 +69,13 @@ public class Account {
                 statement.setInt(2, customer_id);
 
                 try(ResultSet res = statement.executeQuery()){
-                    if(!res.next()){
-                        System.out.println("Account id doesn't exist for current customer");
-                        return;
-                    }
-
-                    while(res.next()){
+                    if(res.next()){
                         System.out.print("Account ID: " + res.getInt("account_id"));
                         System.out.println("\tAccount type: " +res.getString("account_type"));
                         System.out.println("Current Balance: " + res.getDouble("current_balance"));
+                    } else {
+                        System.out.println("Account id doesn't exist for current customer");
+                        return;
                     }
                 }
             }
@@ -125,7 +123,7 @@ public class Account {
 
                 int rowsAffected = statement.executeUpdate();
                 if (rowsAffected > 0) {
-                    TransactionHistory.generateTransactionRecord("deposit", account_id, null, amount);
+                    TransactionHistory.generateAccountTransactionRecord(null, account_id, amount);
                     System.out.println("Deposited Successfully");
                 }
             }
@@ -166,7 +164,7 @@ public class Account {
 
                 int rowsAffected = statement.executeUpdate();
                 if (rowsAffected > 0) {
-                    TransactionHistory.generateTransactionRecord("withdrawal", account_id, null, amount);
+                    TransactionHistory.generateAccountTransactionRecord(account_id, null, amount);
                     System.out.println("Withdrawn Successfully");
                 }
             }
@@ -212,7 +210,6 @@ public class Account {
                     System.out.println("Account doesn't exist");
                     return;
                 }
-                TransactionHistory.generateTransactionRecord("deposit", dest_id, null, amount);
             }
 
             String deductQuery = "UPDATE account SET current_balance = current_balance - ? WHERE account_id = ?";
@@ -224,7 +221,7 @@ public class Account {
                 int rowsAffected = statement.executeUpdate();
                 if (rowsAffected > 0) {
                     System.out.println("Transferred Successfully");
-                    TransactionHistory.generateTransactionRecord("transfer", account_id, null, amount);
+                    TransactionHistory.generateAccountTransactionRecord(account_id, dest_id, amount);
                 }
             }
 
@@ -315,13 +312,13 @@ public class Account {
             calendar.set(Calendar.MONTH, month - 1);
             calendar.set(Calendar.YEAR, year);
 
-            String outgoing = "SELECT SUM(amount) FROM transaction_history th\n" +
-                    "WHERE (transaction_type = \"withdrawal\" OR transaction_type = \"transfer\") AND account_id = ?\n" +
+            String outgoing = "SELECT SUM(amount) FROM account_transaction_history th\n" +
+                    "WHERE sender_acc_id = ? \n" +
                     "AND MONTH(transaction_date) = MONTH(?)" +
                     "AND YEAR(transaction_date) = YEAR(?);";
 
-            String incoming = "SELECT SUM(amount) FROM transaction_history th\n" +
-                    "WHERE transaction_type = \"deposit\" AND account_id = ?\n" +
+            String incoming = "SELECT SUM(amount) FROM account_transaction_history th\n" +
+                    "WHERE receiver_acc_id = ?\n" +
                     "AND MONTH(transaction_date) = MONTH(?)" +
                     "AND YEAR(transaction_date) = YEAR(?);";
 
@@ -354,25 +351,31 @@ public class Account {
                 }
             }
 
-            String transacHistory = "SELECT * FROM transaction_history th\n" +
-                    "WHERE account_id = ?\n" +
+            String TransacHistory = "SELECT * FROM account_transaction_history th\n" +
+                    "WHERE sender_acc_id = ? OR receiver_acc_id = ?\n" +
                     "AND MONTH(transaction_date) = MONTH(?)\n" +
                     "AND YEAR(transaction_date) = YEAR(?)\n" +
                     "ORDER BY transaction_date;";
 
-            try(PreparedStatement statement = con.prepareStatement(transacHistory)){
+            try(PreparedStatement statement = con.prepareStatement(TransacHistory)){
                 statement.setInt(1, account_id);
+                statement.setInt(2, account_id);
                 java.sql.Date sqlDate = new java.sql.Date(calendar.getTime().getTime());
-                statement.setDate(2, sqlDate);
                 statement.setDate(3, sqlDate);
+                statement.setDate(4, sqlDate);
 
-                System.out.printf("%10s  %-10s  %-9s%n", "Transaction", "Date", "Amount");
                 try(ResultSet res = statement.executeQuery()){
+                    System.out.printf("%10s  %-10s  %-9s%n", "Transaction", "Date", "Amount");
                     while(res.next()){
                         String amt = "Php " + res.getDouble("amount");
-                        System.out.printf("%-12s  %-9s  %-9s%n", res.getString("transaction_type"),
-                                 res.getDate("transaction_date"), amt
-                               );
+
+                        if(res.getInt("sender_acc_id") != account_id){
+                            System.out.printf("%-10s  %-9s  %-9s%n", "Incoming",
+                                    res.getDate("transaction_date"), amt);
+                        } else {
+                            System.out.printf("%-10s  %-9s  %-9s%n", "Outgoing",
+                                    res.getDate("transaction_date"), amt);
+                        }
                     }
                 }
             }

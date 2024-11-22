@@ -35,7 +35,7 @@ CREATE TABLE `account` (
   KEY `account_type_idx` (`account_type`),
   CONSTRAINT `account_type_FK` FOREIGN KEY (`account_type`) REFERENCES `account_type` (`account_name`),
   CONSTRAINT `customer_id` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -44,8 +44,41 @@ CREATE TABLE `account` (
 
 LOCK TABLES `account` WRITE;
 /*!40000 ALTER TABLE `account` DISABLE KEYS */;
-INSERT INTO `account` VALUES (1,'savings',11979.01,'2024-11-13','active',1),(2,'checkings',15021.00,'2024-11-19','active',1),(3,'savings',100.00,'2024-11-22','active',4);
+INSERT INTO `account` VALUES (1,'savings',11870.01,'2024-11-13','active',1),(2,'checkings',15041.00,'2024-11-19','active',1),(3,'savings',100.00,'2024-11-22','active',4),(4,'checkings',1000.00,'2024-11-22','active',4);
 /*!40000 ALTER TABLE `account` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `account_transaction_history`
+--
+
+DROP TABLE IF EXISTS `account_transaction_history`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `account_transaction_history` (
+  `transaction_id` int NOT NULL AUTO_INCREMENT,
+  `amount` decimal(16,2) NOT NULL,
+  `transaction_date` datetime NOT NULL,
+  `transaction_status` enum('success','fail') NOT NULL,
+  `sender_acc_id` int DEFAULT NULL,
+  `receiver_acc_id` int DEFAULT NULL,
+  PRIMARY KEY (`transaction_id`),
+  UNIQUE KEY `transaction_id_UNIQUE` (`transaction_id`),
+  KEY `outgoing_acc_idx` (`sender_acc_id`),
+  KEY `incoming_acc_idx` (`receiver_acc_id`),
+  CONSTRAINT `incoming_acc` FOREIGN KEY (`receiver_acc_id`) REFERENCES `account` (`account_id`),
+  CONSTRAINT `outgoing_acc` FOREIGN KEY (`sender_acc_id`) REFERENCES `account` (`account_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `account_transaction_history`
+--
+
+LOCK TABLES `account_transaction_history` WRITE;
+/*!40000 ALTER TABLE `account_transaction_history` DISABLE KEYS */;
+INSERT INTO `account_transaction_history` VALUES (1,11.00,'2024-11-22 19:08:08','success',NULL,1),(2,100.00,'2024-11-22 19:08:43','success',1,NULL),(3,20.00,'2024-11-22 19:09:24','success',1,2);
+/*!40000 ALTER TABLE `account_transaction_history` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -173,37 +206,35 @@ INSERT INTO `loan_options` VALUES (1,'Personal Loan',0.07,24,1000000.00,20000.00
 UNLOCK TABLES;
 
 --
--- Table structure for table `transaction_history`
+-- Table structure for table `loan_transaction_history`
 --
 
-DROP TABLE IF EXISTS `transaction_history`;
+DROP TABLE IF EXISTS `loan_transaction_history`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `transaction_history` (
+CREATE TABLE `loan_transaction_history` (
   `transaction_id` int NOT NULL AUTO_INCREMENT,
-  `transaction_type` enum('deposit','withdrawal','loan_payment','transfer') NOT NULL,
   `amount` decimal(16,2) NOT NULL,
   `transaction_date` datetime NOT NULL,
-  `transaction_status` enum('success','processing','failed') NOT NULL,
-  `account_id` int DEFAULT NULL,
-  `loan_id` int DEFAULT NULL,
+  `transaction_status` enum('success','fail') NOT NULL,
+  `sender_acc_id` int NOT NULL,
+  `receiver_loan_id` int NOT NULL,
   PRIMARY KEY (`transaction_id`),
-  UNIQUE KEY `transaction_id_UNIQUE` (`transaction_id`),
-  KEY `account_id_idx` (`account_id`),
-  KEY `loan_id_idx` (`loan_id`),
-  CONSTRAINT `account_id` FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`),
-  CONSTRAINT `loan_id` FOREIGN KEY (`loan_id`) REFERENCES `availed_loans` (`loan_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `idloan_transaction_history_UNIQUE` (`transaction_id`),
+  KEY `sender_loan_payment_FK_idx` (`sender_acc_id`),
+  KEY `receiver_loan_payment_FK_idx` (`receiver_loan_id`),
+  CONSTRAINT `receiver_loan_payment_FK` FOREIGN KEY (`receiver_loan_id`) REFERENCES `availed_loans` (`loan_id`),
+  CONSTRAINT `sender_loan_payment_FK` FOREIGN KEY (`sender_acc_id`) REFERENCES `account` (`account_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `transaction_history`
+-- Dumping data for table `loan_transaction_history`
 --
 
-LOCK TABLES `transaction_history` WRITE;
-/*!40000 ALTER TABLE `transaction_history` DISABLE KEYS */;
-INSERT INTO `transaction_history` VALUES (1,'deposit',10.00,'2024-11-19 00:00:00','success',1,NULL),(2,'deposit',10.00,'2024-11-19 20:49:55','success',1,NULL),(3,'withdrawal',10.00,'2024-11-19 20:53:20','success',1,NULL),(6,'deposit',1.00,'2024-11-19 20:55:26','success',2,NULL),(7,'transfer',1.00,'2024-11-19 20:55:26','success',1,NULL),(8,'deposit',0.01,'2024-11-19 20:56:25','success',1,NULL);
-/*!40000 ALTER TABLE `transaction_history` ENABLE KEYS */;
+LOCK TABLES `loan_transaction_history` WRITE;
+/*!40000 ALTER TABLE `loan_transaction_history` DISABLE KEYS */;
+/*!40000 ALTER TABLE `loan_transaction_history` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -215,4 +246,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-22 16:46:48
+-- Dump completed on 2024-11-22 19:29:02
