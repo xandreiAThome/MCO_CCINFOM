@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.sql.Date;
 import HelperClass.UserInput;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
+
 public class AvailedLoans {
 
     enum LoanStatus {
@@ -228,6 +230,7 @@ public class AvailedLoans {
         LoanStatus loanStatus;
         int account_id;
         double accountDeduction = 0;
+        double lateLoanFee = 0;
 
         try {
             Connection connection = DriverManager.getConnection(
@@ -247,8 +250,6 @@ public class AvailedLoans {
             ResultSet amtInfoResultSet = preparedStatementAmountInfo.executeQuery();
 
             LocalDate currentDate = LocalDate.now();
-
-            //Check current date compare to date of start if start date then print the first month amort if not show succeeding
 
             if (amtInfoResultSet.next()){
                 startDate = amtInfoResultSet.getDate("start_date");
@@ -272,10 +273,13 @@ public class AvailedLoans {
                 monthPayment = monthlyAmort;
             }
 
-            outstandingBal = monthPayment + interestAmort;
+            lateLoanFee = lateLoanAmount(loan_id,firstMonthAmort,monthlyAmort,interestAmort,monthChecker);
+
+            outstandingBal = monthPayment + interestAmort + lateLoanFee;
             System.out.println("---BREAKDOWN---");
             System.out.println("Amortization for the Current Month: ₱" + monthPayment);
             System.out.println("Monthly Interest Amortization: ₱" + interestAmort);
+            System.out.println("Late Fee: ₱" + lateLoanFee);
             System.out.println("Outstanding Balance for the Month: ₱" + outstandingBal);
 
             System.out.println("Select Account to Pay ");
@@ -338,17 +342,62 @@ public class AvailedLoans {
                     TransactionHistory.generateTransactionRecord("loan_payment", account_id, loan_id, outstandingBal);
                 }
             }
-
-
-           //Check if they already paid for the moth
-            // Add late payment solution
-
-
-
-
         } catch(SQLException e){
             e.printStackTrace();
         }
+    }
+
+    public double lateLoanAmount(int loan_id, double firstMonthPayment, double succeedingMonthPayment, double interestPayment, boolean monthChecker){
+
+        double answer = 0;
+        LocalDate currDate = LocalDate.now();
+        Date lastDatePaid = null;
+        double lateFee = 500;
+
+
+        try {
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "java",
+                    "password"
+            );
+
+            String getLastDatePaidQuery = "SELECT * FROM transaction_history WHERE loan_id = ? ORDER BY transaction_date DESC LIMIT 1 ";
+            PreparedStatement preparedStatement = connection.prepareStatement(getLastDatePaidQuery);
+            preparedStatement.setInt(1,loan_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()){
+                lastDatePaid =  resultSet.getDate("transaction_date");
+            }
+
+            if (currDate.getYear() == lastDatePaid.getYear() && currDate.getMonthValue() == lastDatePaid.getMonth() + 1){
+                System.out.println("You don't have late fees!");
+                return answer;
+            } else {
+                int startYear = currDate.getYear();
+                int startMonth = currDate.getMonthValue();
+                int endYear = lastDatePaid.getYear();
+                int endMonth = lastDatePaid.getMonth() + 1;
+
+                int monthsBetween = ((endYear - startYear) * 12 + (endMonth - startMonth));  //Months in between + the late month
+
+                if (monthsBetween < 1) {
+                    monthsBetween = 1;
+                }
+
+                if (monthChecker) {
+                    answer = firstMonthPayment + interestPayment + succeedingMonthPayment * (monthsBetween - 1) + lateFee * monthsBetween;
+                } else {
+                    answer = succeedingMonthPayment * monthsBetween + lateFee * monthsBetween;
+                }
+
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return answer;
     }
 
 }
