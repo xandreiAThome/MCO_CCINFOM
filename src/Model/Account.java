@@ -36,12 +36,16 @@ public class Account {
                 "jdbc:mysql://localhost:3306/bankdb",
                 "java",
                 "password")) {
-            String checkQuery = "SELECT * FROM account WHERE customer_id = ?";
+            String checkQuery = "SELECT * FROM account WHERE customer_id = ? AND account_status = 'active'";
 
             try(PreparedStatement statement = con.prepareStatement(checkQuery)){
                 statement.setInt(1, customer_id);
 
                 try(ResultSet res = statement.executeQuery()){
+                    if(!res.isBeforeFirst()){
+                        System.out.println("No accounts opened");
+                    }
+
                     while(res.next()){
                         System.out.print("Account ID: " + res.getInt("account_id"));
                         System.out.println("\tAccount type: " +res.getString("account_type"));
@@ -62,7 +66,7 @@ public class Account {
                 "jdbc:mysql://localhost:3306/bankdb",
                 "java",
                 "password")) {
-            String checkQuery = "SELECT * FROM account WHERE account_id = ? AND customer_id = ?";
+            String checkQuery = "SELECT * FROM account WHERE account_id = ? AND customer_id = ? AND account_status = 'active'";
 
             try(PreparedStatement statement = con.prepareStatement(checkQuery)){
                 statement.setInt(1, account_id);
@@ -86,10 +90,10 @@ public class Account {
         int option;
         do{
             System.out.println("1 - Deposit to Account\n2 - Withdraw from Account\n3 - Transfer to another Account" +
-                    "\n4 - View Statement Of Account");
-            System.out.println("Choose option: ");
+                    "\n4 - View Statement Of Account\n5 - Close Account");
+            System.out.print("Choose option: ");
             option = Integer.parseInt(UserInput.getScanner().nextLine());
-        } while(option < 1 || option > 4);
+        } while(option < 1 || option > 5);
 
         switch (option){
             case 1:
@@ -104,6 +108,9 @@ public class Account {
             case 4:
                 showMonthStatementOfAccount(account_id);
                 break;
+            case 5:
+                closeAccount(account_id);
+                break;
         }
 
     }
@@ -115,7 +122,7 @@ public class Account {
                 "password")) {
             System.out.print("Input amount to deposit: ");
             double amount = Double.parseDouble(UserInput.getScanner().nextLine());
-            String query = "UPDATE account SET current_balance = current_balance + ? WHERE account_id = ?";
+            String query = "UPDATE account SET current_balance = current_balance + ? WHERE account_id = ? AND account_status = 'active'";
 
             try(PreparedStatement statement = con.prepareStatement(query)){
                 statement.setDouble(1, amount);
@@ -141,7 +148,7 @@ public class Account {
             System.out.print("Input amount to withdraw: ");
             double amount = Double.parseDouble(UserInput.getScanner().nextLine());
 
-            String query = "SELECT current_balance FROM account WHERE account_id = ?";
+            String query = "SELECT current_balance FROM account WHERE account_id = ? AND account_status = 'active'";
 
             try(PreparedStatement statement = con.prepareStatement(query)){
                 statement.setInt(1, account_id);
@@ -156,7 +163,7 @@ public class Account {
                 }
             }
 
-            String updateQuery = "UPDATE account SET current_balance = current_balance - ? WHERE account_id = ?";
+            String updateQuery = "UPDATE account SET current_balance = current_balance - ? WHERE account_id = ? AND account_status = 'active'";
 
             try(PreparedStatement statement = con.prepareStatement(updateQuery)){
                 statement.setDouble(1, amount);
@@ -182,7 +189,7 @@ public class Account {
             System.out.print("Input amount to transfer: ");
             double amount = Double.parseDouble(UserInput.getScanner().nextLine());
 
-            String query = "SELECT current_balance FROM account WHERE account_id = ?";
+            String query = "SELECT current_balance FROM account WHERE account_id = ? AND account_status = 'active'";
 
             try(PreparedStatement statement = con.prepareStatement(query)){
                 statement.setInt(1, account_id);
@@ -199,7 +206,7 @@ public class Account {
             System.out.print("Input Account ID to transfer to: ");
             int dest_id = Integer.parseInt(UserInput.getScanner().nextLine());
 
-            String transferQuery = "UPDATE account SET current_balance = current_balance + ? WHERE account_id = ?";
+            String transferQuery = "UPDATE account SET current_balance = current_balance + ? WHERE account_id = ? AND account_status = 'active'";
 
             try(PreparedStatement statement = con.prepareStatement(transferQuery)){
                 statement.setDouble(1, amount);
@@ -212,7 +219,7 @@ public class Account {
                 }
             }
 
-            String deductQuery = "UPDATE account SET current_balance = current_balance - ? WHERE account_id = ?";
+            String deductQuery = "UPDATE account SET current_balance = current_balance - ? WHERE account_id = ? AND account_status = 'active'";
 
             try(PreparedStatement statement = con.prepareStatement(deductQuery)){
                 statement.setDouble(1, amount);
@@ -393,9 +400,8 @@ public class Account {
                 "jdbc:mysql://localhost:3306/bankdb",
                 "java",
                 "password")) {
-
             // Step 1: Verify the account balance is zero and no pending loans
-            String checkBalanceQuery = "SELECT current_balance, account_status FROM account WHERE account_id = ?";
+            String checkBalanceQuery = "SELECT current_balance, account_status FROM account WHERE account_id = ?;";
             double currentBalance = 0.0;
             String accountStatus = "";
 
@@ -422,21 +428,12 @@ public class Account {
                 return;
             }
 
-            String checkLoansQuery = "SELECT COUNT(*) FROM loans WHERE account_id = ? AND loan_status = 'Pending'";
-            try (PreparedStatement statement = con.prepareStatement(checkLoansQuery)) {
-                statement.setInt(1, account_id);
-                try (ResultSet res = statement.executeQuery()) {
-                    if (res.next() && res.getInt(1) > 0) {
-                        System.out.println("Account cannot be closed. There are pending loans.");
-                        return;
-                    }
-                }
-            }
-
             // Step 2: Check for any pending transactions or fees
-            String checkPendingTransactionsQuery = "SELECT COUNT(*) FROM transaction_history WHERE account_id = ? AND transaction_status = 'Pending'";
+            String checkPendingTransactionsQuery = "SELECT COUNT(*) FROM account_transaction_history WHERE " +
+                    "(sender_acc_id = ? OR receiver_acc_id = ?) AND transaction_status = 'Pending'";
             try (PreparedStatement statement = con.prepareStatement(checkPendingTransactionsQuery)) {
                 statement.setInt(1, account_id);
+                statement.setInt(2, account_id);
                 try (ResultSet res = statement.executeQuery()) {
                     if (res.next() && res.getInt(1) > 0) {
                         System.out.println("Account cannot be closed. There are pending transactions or fees.");
@@ -445,33 +442,29 @@ public class Account {
                 }
             }
 
-            // Step 3: Update the account status to "Closed"
-            String updateAccountQuery = "UPDATE account SET account_status = 'Closed' WHERE account_id = ?";
-            try (PreparedStatement statement = con.prepareStatement(updateAccountQuery)) {
-                statement.setInt(1, account_id);
-                int rowsAffected = statement.executeUpdate();
-                if (rowsAffected > 0) {
-                    System.out.println("Account status updated to Closed.");
-                } else {
-                    System.out.println("Failed to update account status.");
-                    return;
+            System.out.print("Type YES to close Account: ");
+            String confirm = UserInput.getScanner().nextLine();
+
+            if(confirm.equals("YES")){
+                // Step 3: Update the account status to "Closed"
+                String updateAccountQuery = "UPDATE account SET account_status = 'Closed' WHERE account_id = ?";
+                try (PreparedStatement statement = con.prepareStatement(updateAccountQuery)) {
+                    statement.setInt(1, account_id);
+                    int rowsAffected = statement.executeUpdate();
+                    if (rowsAffected > 0) {
+                        System.out.println("Account status updated to Closed.");
+                    } else {
+                        System.out.println("Failed to update account status.");
+                        return;
+                    }
                 }
+
+                System.out.println("Account closed successfully.");
+            } else {
+                System.out.println("Cancelled closing account");
             }
 
-            // Step 4: Record the account closure in Transaction History
-            String insertTransactionQuery = "INSERT INTO transaction_history (account_id, transaction_type, transaction_date, amount) " +
-                    "VALUES (?, 'Account Closure', NOW(), 0.0)";
-            try (PreparedStatement statement = con.prepareStatement(insertTransactionQuery)) {
-                statement.setInt(1, account_id);
-                int rowsAffected = statement.executeUpdate();
-                if (rowsAffected > 0) {
-                    System.out.println("Account closure recorded in transaction history.");
-                } else {
-                    System.out.println("Failed to record account closure.");
-                }
-            }
 
-            System.out.println("Account closed successfully.");
 
         } catch (SQLException e) {
             e.printStackTrace();

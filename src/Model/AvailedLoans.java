@@ -24,6 +24,10 @@ public class AvailedLoans {
             preparedStatementInfo.setInt(1, customer_id);
             ResultSet infoResultSet = preparedStatementInfo.executeQuery();
 
+            if(!infoResultSet.isBeforeFirst()){
+                System.out.println("No Availed Loans");
+            }
+
             System.out.println("Your Availed Loans: ");
             while(infoResultSet.next()){
                 System.out.println("------------------------------------------------------");
