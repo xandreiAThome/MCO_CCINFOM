@@ -54,20 +54,26 @@ public class Account {
 
         System.out.print("Input Account ID to Open Account: ");
         int acc_id = Integer.parseInt(UserInput.getScanner().nextLine());
-        viewAccountInfo(acc_id);
+        viewAccountInfo(acc_id, customer_id);
     }
 
-    public static void viewAccountInfo (int account_id){
+    public static void viewAccountInfo (int account_id, int customer_id){
         try (Connection con = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/bankdb",
                 "java",
                 "password")) {
-            String checkQuery = "SELECT * FROM account WHERE account_id = ?";
+            String checkQuery = "SELECT * FROM account WHERE account_id = ? AND customer_id = ?";
 
             try(PreparedStatement statement = con.prepareStatement(checkQuery)){
                 statement.setInt(1, account_id);
+                statement.setInt(2, customer_id);
 
                 try(ResultSet res = statement.executeQuery()){
+                    if(!res.next()){
+                        System.out.println("Account id doesn't exist for current customer");
+                        return;
+                    }
+
                     while(res.next()){
                         System.out.print("Account ID: " + res.getInt("account_id"));
                         System.out.println("\tAccount type: " +res.getString("account_type"));
@@ -244,13 +250,13 @@ public class Account {
                 choice = Integer.parseInt(UserInput.getScanner().nextLine());
                 switch (choice) {
                     case 1:
-                        account_type = "Savings";
+                        account_type = "savings";
                         break;
                     case 2:
-                        account_type = "Checkings";
+                        account_type = "checkings";
                         break;
                     case 3:
-                        account_type = "Passbook";
+                        account_type = "passbook";
                         break;
                     default:
                         System.out.println("Invalid choice. Please select again.");
@@ -262,13 +268,12 @@ public class Account {
             double initial_deposit = Double.parseDouble(UserInput.getScanner().nextLine());
 
             // Insert new account into the database
-            String insertQuery = "INSERT INTO account (account_type, current_balance, date_opened, interest_rate, account_status, customer_id) " +
-                    "VALUES (?, ?, NOW(), ?, 'Active', ?)";
+            String insertQuery = "INSERT INTO account (account_type, current_balance, date_opened, account_status, customer_id) " +
+                    "VALUES (?, ?, NOW(), 'Active', ?)";
             try (PreparedStatement statement = con.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, account_type);
                 statement.setDouble(2, initial_deposit);
-                //statement.setDouble(3, interest_rate);
-                statement.setInt(4, customer_id);
+                statement.setInt(3, customer_id);
 
                 int rowsAffected = statement.executeUpdate();
                 if (rowsAffected > 0) {

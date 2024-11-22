@@ -24,18 +24,18 @@ DROP TABLE IF EXISTS `account`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `account` (
   `account_id` int NOT NULL AUTO_INCREMENT,
-  `account_type` enum('savings','checkings','passbook') NOT NULL,
+  `account_type` varchar(45) NOT NULL,
   `current_balance` decimal(16,2) NOT NULL,
-  `minimum_balance` decimal(16,2) NOT NULL,
   `date_opened` date NOT NULL,
-  `interest_rate` decimal(16,2) NOT NULL,
   `account_status` enum('active','closed') NOT NULL,
   `customer_id` int NOT NULL,
   PRIMARY KEY (`account_id`),
   UNIQUE KEY `account_id_UNIQUE` (`account_id`),
   KEY `customer_id_idx` (`customer_id`),
+  KEY `account_type_idx` (`account_type`),
+  CONSTRAINT `account_type_FK` FOREIGN KEY (`account_type`) REFERENCES `account_type` (`account_name`),
   CONSTRAINT `customer_id` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -44,8 +44,34 @@ CREATE TABLE `account` (
 
 LOCK TABLES `account` WRITE;
 /*!40000 ALTER TABLE `account` DISABLE KEYS */;
-INSERT INTO `account` VALUES (1,'savings',11979.01,3000.00,'2024-11-13',0.50,'active',1),(2,'checkings',15021.00,5000.00,'2024-11-19',0.20,'active',1);
+INSERT INTO `account` VALUES (1,'savings',11979.01,'2024-11-13','active',1),(2,'checkings',15021.00,'2024-11-19','active',1),(3,'savings',100.00,'2024-11-22','active',4);
 /*!40000 ALTER TABLE `account` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `account_type`
+--
+
+DROP TABLE IF EXISTS `account_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `account_type` (
+  `account_name` varchar(45) NOT NULL,
+  `interest_rate` decimal(16,2) NOT NULL,
+  `minimum_balance` decimal(16,2) NOT NULL,
+  PRIMARY KEY (`account_name`),
+  UNIQUE KEY `idnew_table_UNIQUE` (`account_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `account_type`
+--
+
+LOCK TABLES `account_type` WRITE;
+/*!40000 ALTER TABLE `account_type` DISABLE KEYS */;
+INSERT INTO `account_type` VALUES ('checkings',0.20,5000.00),('passbook',5.00,10000.00),('savings',0.25,3000.00);
+/*!40000 ALTER TABLE `account_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -104,7 +130,7 @@ CREATE TABLE `customer` (
   `email_address` varchar(45) NOT NULL,
   PRIMARY KEY (`customer_id`),
   UNIQUE KEY `customer_id_UNIQUE` (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -113,7 +139,7 @@ CREATE TABLE `customer` (
 
 LOCK TABLES `customer` WRITE;
 /*!40000 ALTER TABLE `customer` DISABLE KEYS */;
-INSERT INTO `customer` VALUES (1,'Juan','Tamad','2000-12-11','09123456789','juan@lol.com'),(2,'Ken','Lo','2004-01-12','09','@a'),(3,'Juan','Tamad','2004-12-01','1','1');
+INSERT INTO `customer` VALUES (1,'Juan','Tamad','2000-12-11','09123456789','juan@lol.com'),(2,'Ken','Lo','2004-01-12','09','@a'),(3,'Juan','Tamad','2004-12-01','1','1'),(4,'mike','tyson','2000-10-10','0912','@lol');
 /*!40000 ALTER TABLE `customer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -189,4 +215,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-20 17:22:41
+-- Dump completed on 2024-11-22 16:46:48
