@@ -388,25 +388,48 @@ public class Account {
         }
     }
 
-    public static void closeAccount(int account_id) {
+    public static void closeAccount() {
         try (Connection con = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/bankdb",
                 "java",
                 "password")) {
 
-            // Step 1: Verify the account balance is zero and no pending loans
-            String checkBalanceQuery = "SELECT current_balance, account_status FROM account WHERE account_id = ?";
+            // Step 1: Display all active accounts
+            System.out.println("Fetching all active accounts...");
+            String fetchAccountsQuery = "SELECT account_id, account_type, current_balance FROM account WHERE account_status = 'Active'";
+            try (PreparedStatement statement = con.prepareStatement(fetchAccountsQuery);
+                 ResultSet res = statement.executeQuery()) {
+
+                if (!res.isBeforeFirst()) {
+                    System.out.println("No active accounts available for closure.");
+                    return;
+                }
+
+                System.out.println("Active Accounts:");
+                while (res.next()) {
+                    System.out.println("Account ID: " + res.getInt("account_id") +
+                            ", Type: " + res.getString("account_type") +
+                            ", Balance: " + res.getDouble("current_balance"));
+                }
+            }
+
+            // Step 2: Prompt user to select an account ID
+            System.out.print("Enter the Account ID to close: ");
+            int account_id = Integer.parseInt(UserInput.getScanner().nextLine());
+
+            // Step 3: Verify the account exists, its balance is zero, and it has no pending loans
+            String checkAccountQuery = "SELECT current_balance, account_status FROM account WHERE account_id = ?";
             double currentBalance = 0.0;
             String accountStatus = "";
 
-            try (PreparedStatement statement = con.prepareStatement(checkBalanceQuery)) {
+            try (PreparedStatement statement = con.prepareStatement(checkAccountQuery)) {
                 statement.setInt(1, account_id);
                 try (ResultSet res = statement.executeQuery()) {
                     if (res.next()) {
                         currentBalance = res.getDouble("current_balance");
                         accountStatus = res.getString("account_status");
                     } else {
-                        System.out.println("Account not found.");
+                        System.out.println("Invalid Account ID.");
                         return;
                     }
                 }
@@ -433,7 +456,7 @@ public class Account {
                 }
             }
 
-            // Step 2: Check for any pending transactions or fees
+            // Step 4: Check for any pending transactions or fees
             String checkPendingTransactionsQuery = "SELECT COUNT(*) FROM transaction_history WHERE account_id = ? AND transaction_status = 'Pending'";
             try (PreparedStatement statement = con.prepareStatement(checkPendingTransactionsQuery)) {
                 statement.setInt(1, account_id);
@@ -445,7 +468,7 @@ public class Account {
                 }
             }
 
-            // Step 3: Update the account status to "Closed"
+            // Step 5: Update the account status to "Closed"
             String updateAccountQuery = "UPDATE account SET account_status = 'Closed' WHERE account_id = ?";
             try (PreparedStatement statement = con.prepareStatement(updateAccountQuery)) {
                 statement.setInt(1, account_id);
@@ -458,7 +481,7 @@ public class Account {
                 }
             }
 
-            // Step 4: Record the account closure in Transaction History
+            // Step 6: Record the account closure in Transaction History
             String insertTransactionQuery = "INSERT INTO transaction_history (account_id, transaction_type, transaction_date, amount) " +
                     "VALUES (?, 'Account Closure', NOW(), 0.0)";
             try (PreparedStatement statement = con.prepareStatement(insertTransactionQuery)) {
@@ -477,6 +500,8 @@ public class Account {
             e.printStackTrace();
         }
     }
+
+
 
 
 
