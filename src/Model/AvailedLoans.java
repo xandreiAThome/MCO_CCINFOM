@@ -213,7 +213,7 @@ public class AvailedLoans {
 
     public void loanPayment(int customer_id){
 
-        Date startDate;
+        Date startDate = null;
         Date endDate;
         double firstMonthAmort = 0;
         double monthlyAmort = 0;
@@ -271,7 +271,7 @@ public class AvailedLoans {
                 monthPayment = monthlyAmort;
             }
 
-            lateLoanFee = lateLoanAmount(loan_id,firstMonthAmort,monthlyAmort,interestAmort,monthChecker);
+            lateLoanFee = lateLoanAmount(loan_id,firstMonthAmort,monthlyAmort,interestAmort,startDate);
 
             outstandingBal = monthPayment + interestAmort + lateLoanFee;
             System.out.println("---BREAKDOWN---");
@@ -345,7 +345,7 @@ public class AvailedLoans {
         }
     }
 
-    public double lateLoanAmount(int loan_id, double firstMonthPayment, double succeedingMonthPayment, double interestPayment, boolean monthChecker){
+    public double lateLoanAmount(int loan_id, double firstMonthPayment, double succeedingMonthPayment, double interestPayment, Date loanAvailed){
 
         double answer = 0;
         LocalDate currDate = LocalDate.now();
@@ -369,28 +369,56 @@ public class AvailedLoans {
                 lastDatePaid =  resultSet.getDate("transaction_date");
             }
 
-            if (currDate.getYear() == lastDatePaid.getYear() && currDate.getMonthValue() == lastDatePaid.getMonth() + 1){
-                System.out.println("You don't have late fees!");
-                return answer;
-            } else {
-                int startYear = currDate.getYear();
-                int startMonth = currDate.getMonthValue();
-                int endYear = lastDatePaid.getYear();
-                int endMonth = lastDatePaid.getMonth() + 1;
+            //System.out.println("TEST Current Date: " + currDate);
+            //System.out.println("TEST Latest Date Paid: " + lastDatePaid);
+            //System.out.println("TEST Last Date Paid month: " + (lastDatePaid.getMonth() + 1));
+            //System.out.println("TEST Current Date Paid month: " + currDate.getMonthValue());
+            //System.out.println("TEST Last Date Paid Year: " + (lastDatePaid.getYear()) + 1900); //Since date is offset from 1900
+            //System.out.println("TEST Current Date Paid Year: " + currDate.getYear());
 
-                int monthsBetween = ((endYear - startYear) * 12 + (endMonth - startMonth));  //Months in between + the late month
-
-                if (monthsBetween < 1) {
-                    monthsBetween = 1;
-                }
-
-                if (monthChecker) {
-                    answer = firstMonthPayment + interestPayment + succeedingMonthPayment * (monthsBetween - 1) + lateFee * monthsBetween;
+            if (lastDatePaid == null) {
+                if (currDate.getYear() == (loanAvailed.getYear() + 1900) && currDate.getMonthValue() == (loanAvailed.getMonth() + 1)){
+                    System.out.println("You don't have late fees!");
+                    return answer;
                 } else {
-                    answer = succeedingMonthPayment * monthsBetween + lateFee * monthsBetween;
+                    int currDateYear = currDate.getYear();
+                    int currDateMonth = currDate.getMonthValue();
+                    int availedLoanYear = loanAvailed.getYear() + 1900;
+                    int availedLoanMonth = loanAvailed.getMonth() + 1;
+
+                    int monthsBetween = ((availedLoanYear - currDateYear) * 12 + (availedLoanMonth - currDateMonth));
+                    //System.out.println("TEST Months Between: " + monthsBetween);
+
+                    if (monthsBetween == 0) {
+                        monthsBetween = 1;
+                    } else if (monthsBetween < 0) {
+                        monthsBetween = monthsBetween * -1;
+                    }
+                    answer = ((firstMonthPayment + interestPayment + succeedingMonthPayment) * (monthsBetween - 1)) + (lateFee * monthsBetween);
                 }
 
+            } else {
+                if (currDate.getYear() == (lastDatePaid.getYear() + 1900) && currDate.getMonthValue() == (lastDatePaid.getMonth() + 1)){
+                    System.out.println("You don't have late fees!");
+                    return answer;
+                } else {
+                    int currDateYear = currDate.getYear();
+                    int currDateMonth = currDate.getMonthValue();
+                    int lastPaidYear = lastDatePaid.getYear() + 1900;
+                    int lastPaidMonth = lastDatePaid.getMonth() + 1;
+
+                    int monthsBetween = ((lastPaidYear - currDateYear) * 12 + (lastPaidMonth - currDateMonth));
+                    //System.out.println("TEST Months Between: " + monthsBetween);
+
+                    if (monthsBetween == 0) {
+                        monthsBetween = 1;
+                    } else if (monthsBetween < 0) {
+                        monthsBetween = monthsBetween * -1;
+                    }
+                    answer = ((succeedingMonthPayment + interestPayment) * monthsBetween) + (lateFee * monthsBetween);
+                }
             }
+
         } catch (SQLException e){
             e.printStackTrace();
         }
