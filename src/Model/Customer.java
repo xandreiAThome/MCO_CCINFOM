@@ -131,7 +131,8 @@ public class Customer {
         int option;
 
         do {
-            System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail New Loan");
+            System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail New Loan" +
+                                "\n5 - Close Account");
             System.out.print("Choose option: ");
             option = Integer.parseInt(UserInput.getScanner().nextLine());
 
