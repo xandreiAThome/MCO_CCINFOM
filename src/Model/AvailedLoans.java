@@ -395,7 +395,7 @@ public class AvailedLoans {
             e.printStackTrace();
         }
 
-        return answer;
+        return Math.round(answer * 100.0) / 100.0;
     }
 
 }
