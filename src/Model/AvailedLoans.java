@@ -1,7 +1,6 @@
 package Model;
 import java.sql.*;
 import java.time.LocalDate;
-
 import java.sql.Date;
 import HelperClass.UserInput;
 
@@ -30,12 +29,12 @@ public class AvailedLoans {
                 System.out.println("------------------------------------------------------");
                 System.out.println("Loan Id: " + infoResultSet.getInt("loan_id"));
                 System.out.println("Loan Option Id: " + infoResultSet.getInt("loan_option_id"));
-                System.out.println("Principle Amount: " + infoResultSet.getDouble("principal_amount"));
-                System.out.println("Principle Amortization: " + infoResultSet.getDouble("first_month_principal_amortization"));
-                System.out.println("Succeeding Principal Amortization: " + infoResultSet.getDouble("succeeding_principal_amortization"));
-                System.out.println("Interest Amortization: " + infoResultSet.getDouble("interest_amortization"));
-                System.out.println("Principle Balance: " + infoResultSet.getDouble("principal_balance"));
-                System.out.println("Interest Balance: " + infoResultSet.getDouble("interest_balance"));
+                System.out.println("Principle Amount: ₱" + infoResultSet.getDouble("principal_amount"));
+                System.out.println("Principle Amortization: ₱" + infoResultSet.getDouble("first_month_principal_amortization"));
+                System.out.println("Succeeding Principal Amortization: ₱" + infoResultSet.getDouble("succeeding_principal_amortization"));
+                System.out.println("Interest Amortization: ₱" + infoResultSet.getDouble("interest_amortization"));
+                System.out.println("Principle Balance: ₱" + infoResultSet.getDouble("principal_balance"));
+                System.out.println("Interest Balance: ₱" + infoResultSet.getDouble("interest_balance"));
                 System.out.println("Start Date: " + infoResultSet.getDate("start_date"));
                 System.out.println("End Date: " + infoResultSet.getDate("end_date"));
                 System.out.println("Monthly Payment Day: " + infoResultSet.getInt("month_payment_day"));
@@ -226,6 +225,10 @@ public class AvailedLoans {
         double currentMoney = 0;
         double accountMinBal = 0;
         double outstandingBal;
+        LoanStatus loanStatus;
+        int account_id;
+        double accountDeduction;
+        double lateLoanFee;
 
         try {
             Connection connection = DriverManager.getConnection(
@@ -236,7 +239,7 @@ public class AvailedLoans {
 
             showAvailedLoans(customer_id);
             System.out.println("Select which loan to pay ");
-            System.out.println("Enter Loan ID: ");
+            System.out.print("Enter Loan ID: ");
             int loan_id = Integer.parseInt(UserInput.getScanner().nextLine());
 
             String getAmountInfoQuery = "SELECT * FROM availed_loans WHERE loan_id = ? ";
@@ -245,8 +248,6 @@ public class AvailedLoans {
             ResultSet amtInfoResultSet = preparedStatementAmountInfo.executeQuery();
 
             LocalDate currentDate = LocalDate.now();
-
-            //Check current date compare to date of start if start date then print the first month amort if not show succeeding
 
             if (amtInfoResultSet.next()){
                 startDate = amtInfoResultSet.getDate("start_date");
@@ -270,15 +271,18 @@ public class AvailedLoans {
                 monthPayment = monthlyAmort;
             }
 
-            outstandingBal = monthPayment + interestAmort;
+            lateLoanFee = lateLoanAmount(loan_id,firstMonthAmort,monthlyAmort,interestAmort,monthChecker);
+
+            outstandingBal = monthPayment + interestAmort + lateLoanFee;
             System.out.println("---BREAKDOWN---");
-            System.out.println("Amortization for the Current Month: " + monthPayment);
-            System.out.println("Monthly Interest Amortization: " + interestAmort);
-            System.out.println("Outstanding Balance for the Month: " + outstandingBal);
+            System.out.println("Amortization for the Current Month: ₱" + monthPayment);
+            System.out.println("Monthly Interest Amortization: ₱" + interestAmort);
+            System.out.println("Late Fee: ₱" + lateLoanFee);
+            System.out.println("Outstanding Balance for the Month: ₱" + outstandingBal);
 
             System.out.println("Select Account to Pay ");
-            System.out.println("Enter Account ID: ");
-            int account_id = Integer.parseInt(UserInput.getScanner().nextLine());
+            System.out.print("Enter Account ID: ");
+            account_id = Integer.parseInt(UserInput.getScanner().nextLine());
 
             String moneyCheckQuery = "SELECT * FROM account WHERE account_id = ?";
             PreparedStatement preparedStatementMoneyQuery = connection.prepareStatement(moneyCheckQuery);
@@ -296,26 +300,102 @@ public class AvailedLoans {
                 if (currentMoney - outstandingBal < accountMinBal){
                     System.out.println("Insufficient funds you will be exceeding the minimum required balance...going back to the main menu");
                 } else {
-                    System.out.println("You've successfully paid for the month!");
+                    String updateAvailedLoansQuery = "UPDATE availed_loans "
+                            + "SET principal_balance = ?, interest_balance = ?, loan_status = ?"
+                            + "WHERE loan_id = ?";
 
+                    principleBal = principleBal - monthPayment;
+                    interestBal = interestBal - interestAmort;
+
+                    if (principleBal + interestBal == 0){
+                        loanStatus = LoanStatus.CLOSED;
+                    } else {
+                        loanStatus = LoanStatus.ACTIVE;
+                    }
+
+                    PreparedStatement preparedStatementUpdate = connection.prepareStatement(updateAvailedLoansQuery);
+                    preparedStatementUpdate.setDouble(1,principleBal);
+                    preparedStatementUpdate.setDouble(2,interestBal);
+                    preparedStatementUpdate.setString(3,loanStatus.name());
+                    preparedStatementUpdate.setInt(4,loan_id);
+
+                    int rowsInserted = preparedStatementUpdate.executeUpdate();
+                    if (rowsInserted > 0) {
+                        System.out.println("You've successfully paid for the month!");
+                    }
+
+                    String updateAccountQuery = "UPDATE account "
+                            + "SET current_balance = ? "
+                            + "WHERE account_id = ?";
+                    accountDeduction = currentMoney - outstandingBal;
+
+                    PreparedStatement preparedStatementUpdate2 = connection.prepareStatement(updateAccountQuery);
+                    preparedStatementUpdate2.setDouble(1, accountDeduction);
+                    preparedStatementUpdate2.setDouble(2, account_id);
+                    int rowsInserted2 = preparedStatementUpdate2.executeUpdate();
+                    if (rowsInserted2 > 0) {
+                        System.out.println("Successfully deducted from your account");
+                    }
+
+                    TransactionHistory.generateTransactionRecord("loan_payment", account_id, loan_id, outstandingBal);
                 }
             }
-
-
-            //Check if current balance is enough
-            //Check if it will exceed the minimum balance
-            //If both will not work then say need to add more money and going to main menu...
-            //Then if all checks out deduct from everything from accounts table and availed loan table
-            //Then check the date if current date is the same as the end date then change status to closed
-            //update transaction history
-            //Then done
-
-
-
-
         } catch(SQLException e){
             e.printStackTrace();
         }
+    }
+
+    public double lateLoanAmount(int loan_id, double firstMonthPayment, double succeedingMonthPayment, double interestPayment, boolean monthChecker){
+
+        double answer = 0;
+        LocalDate currDate = LocalDate.now();
+        Date lastDatePaid = null;
+        double lateFee = 500;
+
+
+        try {
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "java",
+                    "password"
+            );
+
+            String getLastDatePaidQuery = "SELECT * FROM transaction_history WHERE loan_id = ? ORDER BY transaction_date DESC LIMIT 1 ";
+            PreparedStatement preparedStatement = connection.prepareStatement(getLastDatePaidQuery);
+            preparedStatement.setInt(1,loan_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()){
+                lastDatePaid =  resultSet.getDate("transaction_date");
+            }
+
+            if (currDate.getYear() == lastDatePaid.getYear() && currDate.getMonthValue() == lastDatePaid.getMonth() + 1){
+                System.out.println("You don't have late fees!");
+                return answer;
+            } else {
+                int startYear = currDate.getYear();
+                int startMonth = currDate.getMonthValue();
+                int endYear = lastDatePaid.getYear();
+                int endMonth = lastDatePaid.getMonth() + 1;
+
+                int monthsBetween = ((endYear - startYear) * 12 + (endMonth - startMonth));  //Months in between + the late month
+
+                if (monthsBetween < 1) {
+                    monthsBetween = 1;
+                }
+
+                if (monthChecker) {
+                    answer = firstMonthPayment + interestPayment + succeedingMonthPayment * (monthsBetween - 1) + lateFee * monthsBetween;
+                } else {
+                    answer = succeedingMonthPayment * monthsBetween + lateFee * monthsBetween;
+                }
+
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return Math.round(answer * 100.0) / 100.0;
     }
 
 }
