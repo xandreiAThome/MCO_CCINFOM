@@ -11,7 +11,7 @@ public class AvailedLoans {
         CLOSED
     }
 
-    public void showAvailedLoans (int customer_id){
+    public static void showAvailedLoans (int customer_id){
         try {
             Connection connection = DriverManager.getConnection(
                     "jdbc:mysql://127.0.0.1:3306/bankdb",
@@ -51,7 +51,7 @@ public class AvailedLoans {
         }
     }
 
-    public void loanAppli(int customer_id){
+    public static void loanAppli(int customer_id){
         try {
             Connection connection = DriverManager.getConnection(
                     "jdbc:mysql://127.0.0.1:3306/bankdb",
@@ -197,25 +197,25 @@ public class AvailedLoans {
     }
 
 
-    public double firstMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm, double roundedPrincipleAmort) {
+    public static double firstMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm, double roundedPrincipleAmort) {
         double answer;
         answer = principalAmount - (roundedPrincipleAmort * (loanTerm - 1));
         return Math.round(answer * 100.0) / 100.0;
     }
 
-    public double succMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm) {
+    public static double succMonthPrincipalAmortizationLoanFormula(double principalAmount, int loanTerm) {
         double answer;
         answer = principalAmount / loanTerm;
         return Math.round(answer * 100.0) / 100.0;
     }
 
-    public double interest_amortization(double principalAmount, int loanTerm, double interestRate) {
+    public static double interest_amortization(double principalAmount, int loanTerm, double interestRate) {
         double answer;
         answer=(principalAmount * interestRate) / loanTerm;
         return Math.round(answer * 100.0) / 100.0;
     }
 
-    public void loanPayment(int customer_id){
+    public static void loanPayment(int customer_id){
 
         Date startDate = null;
         Date endDate;
@@ -349,7 +349,7 @@ public class AvailedLoans {
         }
     }
 
-    public double lateLoanAmount(int loan_id, double firstMonthPayment, double succeedingMonthPayment, double interestPayment, Date loanAvailed){
+    public static double lateLoanAmount(int loan_id, double firstMonthPayment, double succeedingMonthPayment, double interestPayment, Date loanAvailed){
 
         double answer = 0;
         LocalDate currDate = LocalDate.now();

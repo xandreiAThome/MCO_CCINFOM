@@ -5,7 +5,6 @@ import Model.LoanOptions;
 
 public class EmployeeOptions {
     public static void showOptions(){
-        LoanOptions loanOptions = new LoanOptions();
         System.out.println("1 - Add Loan Options");
         int option = Integer.parseInt(UserInput.getScanner().nextLine());
         while (option < 1 || option > 2) {
@@ -29,7 +28,7 @@ public class EmployeeOptions {
                 System.out.print("Minimum Loan Price: ");
                 double minLoan = Double.parseDouble(UserInput.getScanner().nextLine());
 
-                loanOptions.addLoanOption(loanType,interestRate,loanDur,maxLoan,minLoan);
+                LoanOptions.addLoanOption(loanType,interestRate,loanDur,maxLoan,minLoan);
 
             case 2:
                 break;
