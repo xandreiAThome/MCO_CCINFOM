@@ -14,8 +14,7 @@ import java.util.Date;
 public class Main {
     // Test the connection
     public static void main(String[] args) {
-        LoanOptions loanOptions = new LoanOptions();
-        loanOptions.defaultLoan("jdbc:mysql://localhost:3306/bankdb","java", "password");
+        LoanOptions.defaultLoan("jdbc:mysql://localhost:3306/bankdb","java", "password");
         boolean stop = false;
         while(!stop){
             switch (BankWindow.chooseWindow()){
