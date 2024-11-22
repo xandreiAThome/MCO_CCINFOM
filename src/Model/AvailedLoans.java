@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.sql.Date;
 import HelperClass.UserInput;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
-
 public class AvailedLoans {
 
     enum LoanStatus {
@@ -229,8 +227,8 @@ public class AvailedLoans {
         double outstandingBal;
         LoanStatus loanStatus;
         int account_id;
-        double accountDeduction = 0;
-        double lateLoanFee = 0;
+        double accountDeduction;
+        double lateLoanFee;
 
         try {
             Connection connection = DriverManager.getConnection(
