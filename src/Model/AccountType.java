@@ -127,4 +127,47 @@ public class AccountType {
             e.printStackTrace();
         }
     }
+
+    public static void addDefaultAccountTypes(){
+        try {
+        Connection connection = DriverManager.getConnection(
+                "jdbc:mysql://127.0.0.1:3306/bankdb",
+                "java",
+                "password"
+        );
+
+        String check1 = "SELECT * from account_type WHERE account_name = 'checkings'";
+        String check2 = "SELECT * from account_type WHERE account_name = 'passbook'";
+        String check3 = "SELECT * from account_type WHERE account_name = 'savings'";
+
+        Statement statement1 = connection.createStatement();
+        Statement statement2 = connection.createStatement();
+        Statement statement3 = connection.createStatement();
+
+        ResultSet results1 = statement1.executeQuery(check1);
+        ResultSet results2 = statement2.executeQuery(check2);
+        ResultSet results3 = statement3.executeQuery(check3);
+
+        if(!results1.next()) {
+            String checkings = "INSERT INTO account_type (account_name, interest_rate, minimum_balance) " +
+                    "VALUES ('checkings', 0.2, 5000)";
+            statement1.executeUpdate(checkings);
+        }
+
+        if(!results2.next()) {
+            String passbook = "INSERT INTO account_type (account_name, interest_rate, minimum_balance) " +
+                    "VALUES ('passbook', 5, 10000)";
+            statement2.executeUpdate(passbook);
+        }
+
+        if(!results3.next()) {
+            String savings = "INSERT INTO account_type (account_name, interest_rate, minimum_balance) " +
+                    "VALUES ('passbook', 0.25, 3000)";
+            statement3.executeUpdate(savings);
+        }
+
+    } catch(SQLException e){
+        e.printStackTrace();
+    }}
+
 }

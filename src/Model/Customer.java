@@ -139,6 +139,9 @@ public class Customer {
                 case 1:
                     System.out.println("View Accounts");
                     Account.showAccounts(loggedInSession.customer_id);
+                    System.out.print("Input Account ID to Open Account: ");
+                    int acc_id = Integer.parseInt(UserInput.getScanner().nextLine());
+                    Account.viewAccountInfo(acc_id, loggedInSession.customer_id);
                     break;
 
                 case 2:
