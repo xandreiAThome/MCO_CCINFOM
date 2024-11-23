@@ -431,8 +431,6 @@ public class AvailedLoans {
 
     public static boolean isCustomerAccount(int account_id) {
 
-        String query = "SELECT COUNT(*) c FROM account WHERE account_id = ?";
-
         try {
             Connection connection = DriverManager.getConnection(
                     "jdbc:mysql://127.0.0.1:3306/bankdb",
@@ -440,7 +438,7 @@ public class AvailedLoans {
                     "password"
             );
 
-            String checkerQuery = "SELECT COUNT(*) c FROM account WHERE account_id = ?";
+            String checkerQuery = "SELECT COUNT(*) c FROM account WHERE account_id = ? ";
             PreparedStatement preparedStatement = connection.prepareStatement(checkerQuery);
             preparedStatement.setInt(1,account_id);
             ResultSet resultSet = preparedStatement.executeQuery();
