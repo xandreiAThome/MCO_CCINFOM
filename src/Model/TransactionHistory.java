@@ -126,7 +126,7 @@ public class TransactionHistory {
         }
     }
 
-    public static void generateAnnualLoanPayment (String yearToGenerate){
+    public static void generateAnnualLoanPayment (){
         double totalLoanPayment = 0;
         int totalNumberOfLoanPayment = 0;
 
@@ -137,10 +137,15 @@ public class TransactionHistory {
                     "password"
             );
 
-            String getAnnualReportString = "SELECT * FROM loan_transaction_history WHERE YEAR(transaction_date) = ? AND " +
-                    "transaction_type = 'loan_payment' ";
+            System.out.print("Input year: ");
+            int year = Integer.parseInt(UserInput.getScanner().nextLine());
+
+            Calendar calendar = GregorianCalendar.getInstance();
+            calendar.set(Calendar.YEAR, year);
+
+            String getAnnualReportString = "SELECT * FROM loan_transaction_history WHERE YEAR(transaction_date) = YEAR(?)";
             PreparedStatement preparedStatement = connection.prepareStatement(getAnnualReportString);
-            preparedStatement.setString(1, yearToGenerate);
+            preparedStatement.setDate(1, new java.sql.Date(calendar.getTime().getTime()));
             ResultSet reportResult = preparedStatement.executeQuery();
 
             while (reportResult.next()){
@@ -148,8 +153,7 @@ public class TransactionHistory {
                 totalNumberOfLoanPayment++;
             }
 
-            System.out.println("Annual Loan Payment Report");
-            System.out.println("January 1, " + yearToGenerate + " - December 31, " + yearToGenerate);
+            System.out.println("Annual Loan Payment Volume Report " + year);
             System.out.println("Total Loan Payment Made: ₱" + Math.round(totalLoanPayment * 100.0) / 100.0);
             System.out.println("Total Number of Loan Payments Made: " + totalNumberOfLoanPayment);
 
