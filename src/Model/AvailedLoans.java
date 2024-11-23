@@ -233,6 +233,9 @@ public class AvailedLoans {
         int account_id;
         double accountDeduction;
         double lateLoanFee;
+        String accountType = null;
+        int senderID = 0;
+        int receiverID = 0;
 
         try {
             Connection connection = DriverManager.getConnection(
@@ -295,8 +298,26 @@ public class AvailedLoans {
 
             if (moneyResultSet.next()){
                 currentMoney = moneyResultSet.getDouble("current_balance");
-                //accountMinBal = moneyResultSet.getDouble("minimum_balance");
             }
+
+            String accountTypeQuery = "SELECT * FROM account WHERE account_id = ? ";
+            PreparedStatement preparedStatementAccountType = connection.prepareStatement(accountTypeQuery);
+            preparedStatementAccountType.setInt(1,account_id);
+            ResultSet accountTypeResultSet = preparedStatementAccountType.executeQuery();
+
+            if (accountTypeResultSet.next()){
+                accountType = accountTypeResultSet.getString("account_type");
+            }
+
+            String moneyCheckQuery2 = "SELECT * FROM account_type WHERE account_name = ? ";
+            PreparedStatement preparedStatementMinimumBal = connection.prepareStatement(moneyCheckQuery2);
+            preparedStatementMinimumBal.setString(1,accountType);
+            ResultSet minimumBalResultSet = preparedStatementMinimumBal.executeQuery();
+
+            if (minimumBalResultSet.next()){
+                accountMinBal = minimumBalResultSet.getDouble("minimum_balance");
+            }
+
 
             if (currentMoney < outstandingBal){
                 System.out.println("Insufficient funds...going back to the main menu");
