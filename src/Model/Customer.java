@@ -73,21 +73,6 @@ public class Customer {
                 }
             }
 
-            // Retrieve and display all records from the customer table
-            String selectQuery = "SELECT * FROM customer";
-            try (Statement statement = con.createStatement();
-                 ResultSet res = statement.executeQuery(selectQuery)) {
-
-                System.out.println("\nCustomer Records:");
-                while (res.next()) {
-                    System.out.println("First Name: " + res.getString("customer_first_name"));
-                    System.out.println("Last Name: " + res.getString("customer_last_name"));
-                    System.out.println("Phone: " + res.getString("phone_number"));
-                    System.out.println("Email: " + res.getString("email_address"));
-                    System.out.println("Date of Birth: " + res.getString("birth_date"));
-                    System.out.println("-----------------------");
-                }
-            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
