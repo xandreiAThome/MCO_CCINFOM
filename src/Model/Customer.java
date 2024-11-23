@@ -131,7 +131,8 @@ public class Customer {
         int option;
 
         do {
-            System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail New Loan\n5 - View Monthly Savings Report");
+            System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail New Loan\n" +
+                    "5 - View Monthly Savings Report\n6 - Pay Loan");
             System.out.print("Choose option: ");
             option = Integer.parseInt(UserInput.getScanner().nextLine());
 
@@ -178,8 +179,11 @@ public class Customer {
                     break;
                 default:
                     System.out.println("\nInvalid option. Please choose again.");
+                case 6:
+                    AvailedLoans.loanPayment(loggedInSession.customer_id);
+                    break;
             }
-        } while (option < 1 || option > 4);
+        } while (option < 1 || option > 6);
     }
 
 
