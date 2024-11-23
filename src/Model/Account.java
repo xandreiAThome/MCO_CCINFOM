@@ -42,6 +42,7 @@ public class Account {
                 try(ResultSet res = statement.executeQuery()){
                     if(!res.isBeforeFirst()){
                         System.out.println("No accounts opened");
+                        return;
                     }
 
                     while(res.next()){

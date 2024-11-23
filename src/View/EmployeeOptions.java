@@ -11,7 +11,7 @@ import java.sql.*;
 public class EmployeeOptions {
     public static void showOptions(){
         System.out.println("1 - Add Loan Options\n2 - View Account Types\n3 - View Customers\n" +
-                "4 - View Transaction History of an Account\n5 - View Payment History of an Account" +
+                "4 - View Transaction History of an Account\n5 - View Loan Payment History of an Account" +
                 "\n6 - View Annual Transaction Volume ");
         System.out.print("Choose option: ");
         int option = Integer.parseInt(UserInput.getScanner().nextLine());
@@ -19,7 +19,8 @@ public class EmployeeOptions {
             System.out.println("\nInvalid option Choose again");
             System.out.println("1 - Add Loan Options\n2 - View Account Types\n" +
                     "3 - View Customers\n4 - View Transaction History of an Account" +
-                    "\n5 - View Payment History of an Account");
+                    "\n5 - View Loan Payment History of an Account" +
+                    "\n6 - View Annual Transaction Volume ");
             System.out.print("Choose option: ");
             option = Integer.parseInt(UserInput.getScanner().nextLine());
         }
@@ -37,8 +38,8 @@ public class EmployeeOptions {
                 double maxLoan = Double.parseDouble(UserInput.getScanner().nextLine());
                 System.out.print("Minimum Loan Price: ");
                 double minLoan = Double.parseDouble(UserInput.getScanner().nextLine());
-
                 LoanOptions.addLoanOption(loanType,interestRate,loanDur,maxLoan,minLoan);
+                break;
 
             case 2:
                 AccountType.showAccountTypes();

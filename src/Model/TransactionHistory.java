@@ -137,7 +137,8 @@ public class TransactionHistory {
                     "password"
             );
 
-            String getAnnualReportString = "SELECT * FROM transaction_history WHERE YEAR(transaction_date) = ? AND transaction_type = 'loan_payment' ";
+            String getAnnualReportString = "SELECT * FROM loan_transaction_history WHERE YEAR(transaction_date) = ? AND " +
+                    "transaction_type = 'loan_payment' ";
             PreparedStatement preparedStatement = connection.prepareStatement(getAnnualReportString);
             preparedStatement.setString(1, yearToGenerate);
             ResultSet reportResult = preparedStatement.executeQuery();
