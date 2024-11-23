@@ -120,7 +120,7 @@ public class TransactionHistory {
 
         try {
             Connection connection = DriverManager.getConnection(
-                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "jdbc:mysql://localhost:3306/bankdb",
                     "java",
                     "password"
             );
@@ -159,16 +159,14 @@ public class TransactionHistory {
             );
 
 
-            String startingBalanceQuery = "SELECT balance FROM account_balance_history " +
-                    "WHERE account_id = ? AND DATE_FORMAT(transaction_date, '%Y-%m') < ? " +
-                    "ORDER BY transaction_date DESC LIMIT 1";
+            String startingBalanceQuery = "SELECT current_balance, account_status FROM account WHERE account_id = ?;";
             PreparedStatement startBalanceStmt = connection.prepareStatement(startingBalanceQuery);
             startBalanceStmt.setInt(1, accountId);
-            startBalanceStmt.setString(2, yearToGenerate + "-" + monthToGenerate);
+            //startBalanceStmt.setString(2, yearToGenerate + "-" + monthToGenerate);
             ResultSet startingBalanceResult = startBalanceStmt.executeQuery();
 
             if (startingBalanceResult.next()) {
-                startingBalance = startingBalanceResult.getDouble("balance");
+                startingBalance = startingBalanceResult.getDouble("current_balance");
             }
 
 
@@ -213,6 +211,7 @@ public class TransactionHistory {
 
         } catch (SQLException e) {
             e.printStackTrace();
+
         }
     }
 
