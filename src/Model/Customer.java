@@ -164,8 +164,8 @@ public class Customer {
                     System.out.println("View Monthly Savings Report");
 
 
-                    System.out.print("Enter the account ID: ");
-                    int accountId = Integer.parseInt(UserInput.getScanner().nextLine());
+                    System.out.print("Enter the customer ID: ");
+                    int customer_id = Integer.parseInt(UserInput.getScanner().nextLine());
 
                     System.out.print("Enter the month (MM): ");
                     String monthToGenerate = UserInput.getScanner().nextLine();
@@ -175,7 +175,7 @@ public class Customer {
 
 
                     TransactionHistory transactionHistory = new TransactionHistory();
-                    transactionHistory.generateMonthlySavings(accountId, monthToGenerate, yearToGenerate);
+                    transactionHistory.generateMonthlySavings(customer_id, monthToGenerate, yearToGenerate);
                     break;
                 default:
                     System.out.println("\nInvalid option. Please choose again.");
