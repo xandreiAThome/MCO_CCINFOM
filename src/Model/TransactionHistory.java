@@ -77,7 +77,7 @@ public class TransactionHistory {
         }
     }
 
-    public void generateDailyTransaction(String dateToGenerate){
+    public static void generateDailyTransaction(String dateToGenerate){
 
         double totalOutgoing = 0;
         double totalIncoming = 0;
@@ -113,7 +113,7 @@ public class TransactionHistory {
         }
     }
 
-    public void generateAnnualLoanPayment (String yearToGenerate){
+    public static void generateAnnualLoanPayment (String yearToGenerate){
         double totalLoanPayment = 0;
         int totalNumberOfLoanPayment = 0;
 

@@ -3,7 +3,7 @@ import java.sql.*;
 
 public class LoanOptions {
 
-    public void defaultLoan(String url, String user, String password){
+    public static void defaultLoan(String url, String user, String password){
         try {
             Connection connection = DriverManager.getConnection(
                     url,
@@ -60,7 +60,7 @@ public class LoanOptions {
 
     }
 
-    public void addLoanOption(String loan_option_type, double interest_rate, int loan_duration_month, double max_loan_amount, double min_loan_amount) {
+    public static void addLoanOption(String loan_option_type, double interest_rate, int loan_duration_month, double max_loan_amount, double min_loan_amount) {
         try {
             Connection connection = DriverManager.getConnection(
                     "jdbc:mysql://127.0.0.1:3306/bankdb",
