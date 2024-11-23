@@ -124,30 +124,8 @@ public class AvailedLoans {
 
                     double principleAmort = succMonthPrincipalAmortizationLoanFormula(loanPrin,loanTerm);
                     double firstMonthPay = firstMonthPrincipalAmortizationLoanFormula(loanPrin,loanTerm,principleAmort);
-
-                    int accountUse;
-                    System.out.print("Which account will you use to loan? ");
-                    accountUse = Integer.parseInt(UserInput.getScanner().nextLine());
-
-                    String customerMoney = "SELECT * FROM account WHERE account_id = ?";
-                    PreparedStatement prepStmtMoney = connection.prepareStatement(customerMoney);
-                    prepStmtMoney.setInt(1, accountUse);
-                    ResultSet moneyResult = prepStmtMoney.executeQuery();
-
-                    double money = 0;
-                    while (moneyResult.next()){
-                        money = moneyResult.getDouble("current_balance");
-                    }
-
                     double interestAmort = interest_amortization(loanPrin,loanTerm,interestRate);
-                    //System.out.println("TEST Principle Amort = " + principleAmort);
-                    //System.out.println("TEST First Month Pay = " + firstMonthPay);
-                    //System.out.println("TEST Interest Amortization = " + interestAmort);
 
-                    double sufficientBalChecker = principleAmort + interestAmort + firstMonthPay + interestAmort;
-                    //System.out.println("TEST Money = " + money);
-                    //System.out.println("TEST Sufficient Bal Checker = " + sufficientBalChecker);
-                    if (money >= sufficientBalChecker){
 
                         System.out.println("Approved!");
 
@@ -178,10 +156,6 @@ public class AvailedLoans {
                         if (rowsInserted > 0) {
                             System.out.println("New loan application inserted successfully.");
                         }
-
-                    } else {
-                        System.out.println("Insufficient Funds... Going back to the Main Menu");
-                    }
                 }
             }
 
@@ -290,6 +264,10 @@ public class AvailedLoans {
             System.out.println("Select Account to Pay ");
             System.out.print("Enter Account ID: ");
             account_id = Integer.parseInt(UserInput.getScanner().nextLine());
+
+            //Check if account is for customer account
+
+
 
             String moneyCheckQuery = "SELECT * FROM account WHERE account_id = ?";
             PreparedStatement preparedStatementMoneyQuery = connection.prepareStatement(moneyCheckQuery);
