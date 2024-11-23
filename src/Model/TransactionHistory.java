@@ -145,7 +145,7 @@ public class TransactionHistory {
         }
     }
 // tried
-public void generateMonthlySavings(int customer_id, String monthToGenerate, String yearToGenerate) {
+public void generateMonthlySavings(int customer_id, String yearToGenerate) {
     double totalOutgoing = 0;
     double totalIncoming = 0;
 
@@ -157,40 +157,38 @@ public void generateMonthlySavings(int customer_id, String monthToGenerate, Stri
                 "password"
         );
 
-        // Query to compute the total outgoing transactions (where the account is the sender)
+        // Query to compute the total outgoing transactions for the year
         String outgoingQuery = "SELECT SUM(amount) AS totalOutgoing FROM account_transaction_history " +
-                "WHERE sender_acc_id = ? " +
-                "AND DATE_FORMAT(transaction_date, '%Y-%m') = ?";
+                "WHERE sender_acc_id = ? AND DATE_FORMAT(transaction_date, '%Y') = ?";
         PreparedStatement outgoingStmt = connection.prepareStatement(outgoingQuery);
-        outgoingStmt.setInt(1, customer_id);
-        outgoingStmt.setString(2, yearToGenerate + "-" + monthToGenerate);
+        outgoingStmt.setInt(1, customer_id); // Use the parameter passed to the method
+        outgoingStmt.setString(2, yearToGenerate);
         ResultSet outgoingResult = outgoingStmt.executeQuery();
 
         if (outgoingResult.next()) {
             totalOutgoing = outgoingResult.getDouble("totalOutgoing");
         }
 
-        // Query to compute the total incoming transactions (where the account is the receiver)
+        // Query to compute the total incoming transactions for the year
         String incomingQuery = "SELECT SUM(amount) AS totalIncoming FROM account_transaction_history " +
-                "WHERE receiver_acc_id = ? " +
-                "AND DATE_FORMAT(transaction_date, '%Y-%m') = ?";
+                "WHERE receiver_acc_id = ? AND DATE_FORMAT(transaction_date, '%Y') = ?";
         PreparedStatement incomingStmt = connection.prepareStatement(incomingQuery);
-        incomingStmt.setInt(1, customer_id);
-        incomingStmt.setString(2, yearToGenerate + "-" + monthToGenerate);
+        incomingStmt.setInt(1, customer_id); // Use the parameter passed to the method
+        incomingStmt.setString(2, yearToGenerate);
         ResultSet incomingResult = incomingStmt.executeQuery();
 
         if (incomingResult.next()) {
             totalIncoming = incomingResult.getDouble("totalIncoming");
         }
 
-        // Compute the balance for the month
-        double monthlySavings = totalIncoming - totalOutgoing;
+        // Compute the yearly balance
+        double yearlySavings = totalIncoming - totalOutgoing;
 
         // Display the results
-        System.out.println("Monthly Savings Report for " + monthToGenerate + "-" + yearToGenerate);
+        System.out.println("Yearly Savings Report for " + yearToGenerate);
         System.out.println("Total Incoming: ₱" + Math.round(totalIncoming * 100.0) / 100.0);
         System.out.println("Total Outgoing: ₱" + Math.round(totalOutgoing * 100.0) / 100.0);
-        System.out.println("Net Savings: ₱" + Math.round(monthlySavings * 100.0) / 100.0);
+        System.out.println("Net Savings: ₱" + Math.round(yearlySavings * 100.0) / 100.0);
 
         // Close the database connection
         connection.close();
@@ -199,6 +197,8 @@ public void generateMonthlySavings(int customer_id, String monthToGenerate, Stri
         e.printStackTrace();
     }
 }
+
+
 
     public static void viewTransactionHistoryOfAccount(){
         try {
