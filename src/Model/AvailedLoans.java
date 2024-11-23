@@ -261,13 +261,13 @@ public class AvailedLoans {
             System.out.println("Late Fee: ₱" + lateLoanFee);
             System.out.println("Outstanding Balance for the Month: ₱" + outstandingBal);
 
-            System.out.println("Select Account to Pay ");
-            System.out.print("Enter Account ID: ");
-            account_id = Integer.parseInt(UserInput.getScanner().nextLine());
+            do {
+                System.out.println("Select Account to Pay ");
+                System.out.print("Enter Account ID: ");
+                account_id = Integer.parseInt(UserInput.getScanner().nextLine());
+            } while (isCustomerAccount(account_id));
 
             //Check if account is for customer account
-
-
 
             String moneyCheckQuery = "SELECT * FROM account WHERE account_id = ?";
             PreparedStatement preparedStatementMoneyQuery = connection.prepareStatement(moneyCheckQuery);
@@ -427,6 +427,35 @@ public class AvailedLoans {
         }
 
         return Math.round(answer * 100.0) / 100.0;
+    }
+
+    public static boolean isCustomerAccount(int account_id) {
+
+        String query = "SELECT COUNT(*) c FROM account WHERE account_id = ?";
+
+        try {
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "java",
+                    "password"
+            );
+
+            String checkerQuery = "SELECT COUNT(*) c FROM account WHERE account_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(checkerQuery);
+            preparedStatement.setInt(1,account_id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int loanCount = resultSet.getInt("c");
+                if (loanCount > 1){
+                    return true;
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }
