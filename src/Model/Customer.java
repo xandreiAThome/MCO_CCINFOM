@@ -131,7 +131,7 @@ public class Customer {
         int option;
 
         do {
-            System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail New Loan");
+            System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail New Loan\n5 - View Monthly Savings Report");
             System.out.print("Choose option: ");
             option = Integer.parseInt(UserInput.getScanner().nextLine());
 
@@ -152,6 +152,24 @@ public class Customer {
 
                 case 4:
                     System.out.println("Avail Loans");
+                    break;
+
+                case 5:
+                    System.out.println("View Monthly Savings Report");
+
+
+                    System.out.print("Enter the account ID: ");
+                    int accountId = Integer.parseInt(UserInput.getScanner().nextLine());
+
+                    System.out.print("Enter the month (MM): ");
+                    String monthToGenerate = UserInput.getScanner().nextLine();
+
+                    System.out.print("Enter the year (YYYY): ");
+                    String yearToGenerate = UserInput.getScanner().nextLine();
+
+
+                    TransactionHistory transactionHistory = new TransactionHistory();
+                    transactionHistory.generateMonthlySavings(accountId, monthToGenerate, yearToGenerate);
                     break;
                 default:
                     System.out.println("\nInvalid option. Please choose again.");
