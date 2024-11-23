@@ -1,16 +1,20 @@
 package View;
 
 import HelperClass.UserInput;
+import Model.AccountType;
 import Model.LoanOptions;
+
+import java.sql.*;
 
 public class EmployeeOptions {
     public static void showOptions(){
-        System.out.println("1 - Add Loan Options");
+        System.out.println("1 - Add Loan Options\n2 - View Account Types");
+        System.out.print("Choose option: ");
         int option = Integer.parseInt(UserInput.getScanner().nextLine());
         while (option < 1 || option > 2) {
             System.out.println("\nInvalid option Choose again");
-            System.out.println("1 - Add Loan Options");
-            System.out.print("Choose Window: ");
+            System.out.println("1 - Add Loan Options\n2 - View Account Types");
+            System.out.print("Choose option: ");
             option = Integer.parseInt(UserInput.getScanner().nextLine());
         }
 
@@ -31,7 +35,11 @@ public class EmployeeOptions {
                 LoanOptions.addLoanOption(loanType,interestRate,loanDur,maxLoan,minLoan);
 
             case 2:
+                AccountType.showAccountTypes();
                 break;
         }
     }
 }
+
+
+

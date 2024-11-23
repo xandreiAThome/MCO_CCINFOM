@@ -341,7 +341,7 @@ public class AvailedLoans {
                         System.out.println("Successfully deducted from your account");
                     }
 
-                    TransactionHistory.genereateLoanTransactionRecord(account_id, loan_id, outstandingBal);
+                    TransactionHistory.generateLoanTransactionRecord(account_id, loan_id, outstandingBal);
                 }
             }
         } catch(SQLException e){

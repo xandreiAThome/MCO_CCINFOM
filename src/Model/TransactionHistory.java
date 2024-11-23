@@ -1,6 +1,5 @@
 package Model;
 
-import java.lang.reflect.Type;
 import java.sql.*;
 import java.util.Date;
 
@@ -47,7 +46,7 @@ public class TransactionHistory {
         }
     }
 
-    public static void genereateLoanTransactionRecord(int sender_id, int receiver_id, double amount){
+    public static void generateLoanTransactionRecord(int sender_id, int receiver_id, double amount){
         try {
             Connection con = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/bankdb",
