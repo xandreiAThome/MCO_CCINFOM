@@ -295,7 +295,7 @@ public class AvailedLoans {
 
             if (moneyResultSet.next()){
                 currentMoney = moneyResultSet.getDouble("current_balance");
-                accountMinBal = moneyResultSet.getDouble("minimum_balance");
+                //accountMinBal = moneyResultSet.getDouble("minimum_balance");
             }
 
             if (currentMoney < outstandingBal){
@@ -364,7 +364,7 @@ public class AvailedLoans {
                     "password"
             );
 
-            String getLastDatePaidQuery = "SELECT * FROM transaction_history WHERE loan_id = ? ORDER BY transaction_date DESC LIMIT 1 ";
+            String getLastDatePaidQuery = "SELECT * FROM loan_transaction_history WHERE receiver_loan_id = ? ORDER BY transaction_date DESC LIMIT 1 ";
             PreparedStatement preparedStatement = connection.prepareStatement(getLastDatePaidQuery);
             preparedStatement.setInt(1,loan_id);
             ResultSet resultSet = preparedStatement.executeQuery();
