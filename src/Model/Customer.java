@@ -163,20 +163,24 @@ public class Customer {
                 case 5:
                     System.out.println("View Monthly Savings Report");
 
-
-                    System.out.print("Enter the customer ID: ");
-                    int customer_id = Integer.parseInt(UserInput.getScanner().nextLine());
-
-                    System.out.print("Enter the month (MM): ");
-                    String monthToGenerate = UserInput.getScanner().nextLine();
+                    // Retrieve the customer ID from the logged-in session or context
+                    int customer_id = loggedInSession.getCustomer_id(); // Replace with actual logic
 
                     System.out.print("Enter the year (YYYY): ");
                     String yearToGenerate = UserInput.getScanner().nextLine();
+                    if (!yearToGenerate.matches("\\d{4}")) {
+                        System.out.println("Invalid year format. Please enter in YYYY format.");
+                        break;
+                    }
 
-
-                    TransactionHistory transactionHistory = new TransactionHistory();
-                    transactionHistory.generateMonthlySavings(customer_id, monthToGenerate, yearToGenerate);
+                    try {
+                        TransactionHistory transactionHistory = new TransactionHistory();
+                        transactionHistory.generateMonthlySavings(customer_id, yearToGenerate);
+                    } catch (Exception e) {
+                        System.out.println("An error occurred while generating the report: " + e.getMessage());
+                    }
                     break;
+
                 default:
                     System.out.println("\nInvalid option. Please choose again.");
                 case 6:
