@@ -156,17 +156,17 @@ public void generateMonthlySavings(int customer_id, String yearToGenerate) {
                 "password"
         );
 
-        // Step 1: Retrieve all account IDs for the given customer ID
+        
         String accountQuery = "SELECT account_id FROM account WHERE customer_id = ?";
         PreparedStatement accountStmt = connection.prepareStatement(accountQuery);
         accountStmt.setInt(1, customer_id);
         ResultSet accountResult = accountStmt.executeQuery();
 
-        // Step 2: Loop through each account ID to calculate the total incoming and outgoing
+
         while (accountResult.next()) {
             int accountId = accountResult.getInt("account_id");
 
-            // Query for total outgoing transactions for this account
+
             String outgoingQuery = "SELECT SUM(amount) AS totalOutgoing FROM account_transaction_history " +
                     "WHERE sender_acc_id = ? AND DATE_FORMAT(transaction_date, '%Y') = ?";
             PreparedStatement outgoingStmt = connection.prepareStatement(outgoingQuery);
@@ -178,7 +178,7 @@ public void generateMonthlySavings(int customer_id, String yearToGenerate) {
                 totalOutgoing += outgoingResult.getDouble("totalOutgoing");
             }
 
-            // Query for total incoming transactions for this account
+
             String incomingQuery = "SELECT SUM(amount) AS totalIncoming FROM account_transaction_history " +
                     "WHERE receiver_acc_id = ? AND DATE_FORMAT(transaction_date, '%Y') = ?";
             PreparedStatement incomingStmt = connection.prepareStatement(incomingQuery);
@@ -191,17 +191,14 @@ public void generateMonthlySavings(int customer_id, String yearToGenerate) {
             }
         }
 
-        // Step 3: Compute the yearly balance
+
         double yearlySavings = totalIncoming - totalOutgoing;
 
-        // Display the results
+
         System.out.println("Yearly Savings Report for " + yearToGenerate);
         System.out.println("Total Incoming: ₱" + Math.round(totalIncoming * 100.0) / 100.0);
         System.out.println("Total Outgoing: ₱" + Math.round(totalOutgoing * 100.0) / 100.0);
         System.out.println("Net Savings: ₱" + Math.round(yearlySavings * 100.0) / 100.0);
-
-        // Close the database connection
-        connection.close();
 
     } catch (SQLException e) {
         e.printStackTrace();
