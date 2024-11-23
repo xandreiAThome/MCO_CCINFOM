@@ -1,5 +1,7 @@
 package Model;
 
+import HelperClass.UserInput;
+
 import java.sql.*;
 import java.util.Date;
 
@@ -212,6 +214,106 @@ public class TransactionHistory {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void viewTransactionHistoryOfAccount(){
+        try {
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "java",
+                    "password"
+            );
+
+            System.out.print("Input account id to view transaction history: ");
+            int id = Integer.parseInt(UserInput.getScanner().nextLine());
+
+            System.out.println("Sort By\n1 - Date\n2 - Size of Transaction");
+            System.out.print("Choose option: ");
+            int sort = Integer.parseInt(UserInput.getScanner().nextLine());
+
+            String query = "SELECT * FROM account_transaction_history\n" +
+                    "WHERE sender_acc_id = ? OR receiver_acc_id = ?";
+            String orderAmt = " ORDER BY amount DESC;";
+            String orderDate = " ORDER BY transaction_date DESC;";
+
+            if(sort == 1){
+                query += orderDate;
+            } else if (sort == 2){
+                query += orderAmt;
+            }
+
+            try (PreparedStatement statement = connection.prepareStatement(query)){
+                statement.setInt(1, id);
+                statement.setInt(2, id);
+
+                ResultSet res = statement.executeQuery();
+                if (!res.isBeforeFirst() ) {
+                    System.out.println("Account has no transaction yet");
+                }
+
+                while(res.next()){
+                    System.out.println("Transaction ID: " + res.getInt("transaction_id") +
+                            "\tTransaction Date: " + res.getDate("transaction_date") +
+                            "\tSender Acc ID: " + res.getInt("sender_acc_id") +
+                            "\tReceiver Acc ID: " + res.getInt("receiver_acc_id") +
+                            "\tAmount: " + res.getDouble("amount"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void viewLoanPaymentHistoryOfAccount(){
+        try {
+            Connection connection = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/bankdb",
+                    "java",
+                    "password"
+            );
+
+            System.out.print("Input account id to view Loan Payment history: ");
+            int id = Integer.parseInt(UserInput.getScanner().nextLine());
+
+            System.out.println("Sort By\n1 - Date\n2 - Size of Payment");
+            System.out.print("Choose option: ");
+            int sort = Integer.parseInt(UserInput.getScanner().nextLine());
+
+            String query = "SELECT * FROM loan_transaction_history\n" +
+                    "WHERE sender_acc_id = ?";
+            String orderAmt = " ORDER BY amount DESC;";
+            String orderDate = " ORDER BY transaction_date DESC;";
+
+            if(sort == 1){
+                query += orderDate;
+            } else if (sort == 2){
+                query += orderAmt;
+            }
+
+            try (PreparedStatement statement = connection.prepareStatement(query)){
+                statement.setInt(1, id);
+                statement.setInt(2, id);
+
+                ResultSet res = statement.executeQuery();
+                if (!res.isBeforeFirst() ) {
+                    System.out.println("Account has no payment history yet");
+                }
+
+                while(res.next()){
+                    System.out.println("Payment ID: " + res.getInt("transaction_id") +
+                            "\tTransaction Date: " + res.getDate("transaction_date") +
+                            "\tSender Acc ID: " + res.getInt("sender_acc_id") +
+                            "\tReceiver Loan ID: " + res.getInt("receiver_loan_id") +
+                            "\tAmount: " + res.getDouble("amount"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

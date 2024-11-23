@@ -53,10 +53,6 @@ public class Account {
         } catch (SQLException e){
             e.printStackTrace();
         }
-
-        System.out.print("Input Account ID to Open Account: ");
-        int acc_id = Integer.parseInt(UserInput.getScanner().nextLine());
-        viewAccountInfo(acc_id, customer_id);
     }
 
     public static void viewAccountInfo (int account_id, int customer_id){
