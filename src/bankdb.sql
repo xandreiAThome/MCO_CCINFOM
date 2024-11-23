@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `account`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `account` (
   `account_id` int NOT NULL AUTO_INCREMENT,
-  `account_type` varchar(45) NOT NULL,
+  `account_type` enum('checkings','passbook','savings') NOT NULL,
   `current_balance` decimal(16,2) NOT NULL,
   `date_opened` date NOT NULL,
   `account_status` enum('active','closed') NOT NULL,
@@ -32,10 +32,10 @@ CREATE TABLE `account` (
   PRIMARY KEY (`account_id`),
   UNIQUE KEY `account_id_UNIQUE` (`account_id`),
   KEY `customer_id_idx` (`customer_id`),
-  KEY `account_type_idx` (`account_type`),
+  KEY `account_type_FK_idx` (`account_type`),
   CONSTRAINT `account_type_FK` FOREIGN KEY (`account_type`) REFERENCES `account_type` (`account_name`),
   CONSTRAINT `customer_id` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -44,7 +44,7 @@ CREATE TABLE `account` (
 
 LOCK TABLES `account` WRITE;
 /*!40000 ALTER TABLE `account` DISABLE KEYS */;
-INSERT INTO `account` VALUES (1,'savings',11870.01,'2024-11-13','active',1),(2,'checkings',15041.00,'2024-11-19','active',1),(3,'savings',100.00,'2024-11-22','active',4),(4,'checkings',1000.00,'2024-11-22','active',4);
+INSERT INTO `account` VALUES (1,'savings',11870.01,'2024-11-13','active',1),(2,'checkings',15041.00,'2024-11-19','active',1),(3,'savings',230.00,'2024-11-22','active',4),(4,'checkings',1000.00,'2024-11-22','active',4),(5,'savings',0.00,'2024-11-22','closed',4),(6,'passbook',20.00,'2024-11-22','active',4),(7,'passbook',0.00,'2024-11-22','closed',4),(8,'savings',2.00,'2024-11-22','active',4);
 /*!40000 ALTER TABLE `account` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -68,7 +68,7 @@ CREATE TABLE `account_transaction_history` (
   KEY `incoming_acc_idx` (`receiver_acc_id`),
   CONSTRAINT `incoming_acc` FOREIGN KEY (`receiver_acc_id`) REFERENCES `account` (`account_id`),
   CONSTRAINT `outgoing_acc` FOREIGN KEY (`sender_acc_id`) REFERENCES `account` (`account_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -77,7 +77,7 @@ CREATE TABLE `account_transaction_history` (
 
 LOCK TABLES `account_transaction_history` WRITE;
 /*!40000 ALTER TABLE `account_transaction_history` DISABLE KEYS */;
-INSERT INTO `account_transaction_history` VALUES (1,11.00,'2024-11-22 19:08:08','success',NULL,1),(2,100.00,'2024-11-22 19:08:43','success',1,NULL),(3,20.00,'2024-11-22 19:09:24','success',1,2);
+INSERT INTO `account_transaction_history` VALUES (1,11.00,'2024-11-22 19:08:08','success',NULL,1),(2,100.00,'2024-11-22 19:08:43','success',1,NULL),(3,20.00,'2024-11-22 19:09:24','success',1,2),(4,200.00,'2024-11-22 21:24:45','success',NULL,3),(5,50.00,'2024-11-22 21:25:11','success',3,NULL),(6,20.00,'2024-11-22 21:25:34','success',3,6);
 /*!40000 ALTER TABLE `account_transaction_history` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -89,7 +89,7 @@ DROP TABLE IF EXISTS `account_type`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `account_type` (
-  `account_name` varchar(45) NOT NULL,
+  `account_name` enum('checkings','passbook','savings') NOT NULL,
   `interest_rate` decimal(16,2) NOT NULL,
   `minimum_balance` decimal(16,2) NOT NULL,
   PRIMARY KEY (`account_name`),
@@ -192,7 +192,7 @@ CREATE TABLE `loan_options` (
   `min_loan_amt` decimal(16,2) NOT NULL,
   PRIMARY KEY (`loan_option_id`),
   UNIQUE KEY `idloan_options_UNIQUE` (`loan_option_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -201,7 +201,7 @@ CREATE TABLE `loan_options` (
 
 LOCK TABLES `loan_options` WRITE;
 /*!40000 ALTER TABLE `loan_options` DISABLE KEYS */;
-INSERT INTO `loan_options` VALUES (1,'Personal Loan',0.07,24,1000000.00,20000.00),(2,'Auto Loan',0.10,36,3000000.00,250000.00),(3,'Emergency Loan',0.05,24,750000.00,20000.00);
+INSERT INTO `loan_options` VALUES (1,'Personal Loan',0.07,24,1000000.00,20000.00),(2,'Auto Loan',0.10,36,3000000.00,250000.00),(3,'Emergency Loan',0.05,24,750000.00,20000.00),(4,'kkk',0.50,4,10.00,1.00);
 /*!40000 ALTER TABLE `loan_options` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -246,4 +246,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-22 19:29:02
+-- Dump completed on 2024-11-23 14:49:48

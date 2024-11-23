@@ -118,7 +118,7 @@ public class AvailedLoans {
                         //System.out.println("TEST loanPrin = " + loanPrin);
 
                         if (loanPrin < min || loanPrin > max) {
-                            System.out.println("Invalid choice. Please select an amount between " + min +  "and " + max + ".");
+                            System.out.println("Invalid choice. Please select an amount between " + min +  " and " + max);
                         }
                     } while (loanPrin < min || loanPrin > max);
 

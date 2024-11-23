@@ -148,10 +148,12 @@ public class Customer {
 
                 case 3:
                     System.out.println("View Loans");
+                    AvailedLoans.showAvailedLoans(loggedInSession.customer_id);
                     break;
 
                 case 4:
                     System.out.println("Avail Loans");
+                    AvailedLoans.loanAppli(loggedInSession.customer_id);
                     break;
 
                 case 5:
