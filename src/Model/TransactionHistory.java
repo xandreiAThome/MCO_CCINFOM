@@ -3,7 +3,10 @@ package Model;
 import HelperClass.UserInput;
 
 import java.sql.*;
+import java.text.DateFormatSymbols;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class TransactionHistory {
     private int transaction_id, sender_id, receiver_id;
@@ -56,7 +59,7 @@ public class TransactionHistory {
                     "password");
 
             String insert = "INSERT INTO loan_transaction_history (amount, " +
-                    "transaction_date, transaction_status, sender_acc_id, receiver_acc_id)" +
+                    "transaction_date, transaction_status, sender_acc_id, receiver_loan_id)" +
                     "VALUES (?, NOW(), ?, ?, ?)";
 
             try (PreparedStatement preparedStatement = con.prepareStatement(insert)) {
@@ -78,7 +81,7 @@ public class TransactionHistory {
         }
     }
 
-    public static void generateDailyTransaction(String dateToGenerate){
+    public static void generateAnnualTransaction(){
 
         double totalOutgoing = 0;
         double totalIncoming = 0;
@@ -88,26 +91,35 @@ public class TransactionHistory {
                     "java",
                     "password"
             );
+            Calendar cal = Calendar.getInstance();
+            System.out.print("Input year to view: ");
+            int year = Integer.parseInt(UserInput.getScanner().nextLine());
 
-            String getDayReportQuery = "SELECT * FROM transaction_history WHERE DATE(transaction_date) = ? ";
-            PreparedStatement preparedStatement = connection.prepareStatement(getDayReportQuery);
-            preparedStatement.setString(1, dateToGenerate);
-            ResultSet reportResult = preparedStatement.executeQuery();
+            System.out.println("Transaction Volume for the Year " + year);
 
-            System.out.println("Transaction for that day:");
-            while (reportResult.next()){
-                System.out.println("------------------------------------------------------");
-                System.out.println("Account ID: " + reportResult.getInt("account_id"));
-                System.out.println("Transaction Id: " + reportResult.getInt("transaction_id"));
-                System.out.println("Transaction Type: " + reportResult.getString("transaction_type"));
-                System.out.println("Transaction Amount: ₱" + reportResult.getDouble("amount"));
-                System.out.println("Transaction Id: " + reportResult.getDate("transaction_date"));
-                System.out.println("Transaction Status: " + reportResult.getString("transaction_status"));
-                System.out.println("------------------------------------------------------");
+            Calendar calendar = GregorianCalendar.getInstance();
+            calendar.set(Calendar.YEAR, year);
+
+            String depositQuery = "SELECT SUM(amount) FROM account_transaction_history WHERE YEAR(transaction_date) = YEAR(?) " +
+                    "AND sender_acc_id is null";
+            PreparedStatement incomingStatement = connection.prepareStatement(depositQuery);
+            incomingStatement.setDate(1, new java.sql.Date(calendar.getTime().getTime()));
+            ResultSet depositResult = incomingStatement.executeQuery();
+
+            String withdrawQuery = "SELECT SUM(amount) FROM account_transaction_history WHERE YEAR(transaction_date) = YEAR(?) " +
+                    "AND receiver_acc_id is null";
+            PreparedStatement outgoingStatement = connection.prepareStatement(withdrawQuery);
+            outgoingStatement.setDate(1, new java.sql.Date(calendar.getTime().getTime()));
+            ResultSet withdrawResult = outgoingStatement.executeQuery();
+
+            if(withdrawResult.next()){
+                System.out.println("Total Outgoing: " + withdrawResult.getDouble(1));
             }
 
-            System.out.println("Total Outgoing: " + totalOutgoing);
-            System.out.println("Total Incoming: " + totalIncoming);
+            if(depositResult.next()){
+                System.out.println("Total Incoming: " + depositResult.getDouble(1));
+            }
+
 
         } catch (SQLException e){
             e.printStackTrace();
@@ -286,7 +298,6 @@ public void generateMonthlySavings(int customer_id, String yearToGenerate) {
 
             try (PreparedStatement statement = connection.prepareStatement(query)){
                 statement.setInt(1, id);
-                statement.setInt(2, id);
 
                 ResultSet res = statement.executeQuery();
                 if (!res.isBeforeFirst() ) {

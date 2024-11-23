@@ -132,7 +132,7 @@ public class Customer {
 
         do {
             System.out.println("1 - View Accounts\n2 - Open New Account\n3 - View Loans\n4 - Avail New Loan\n" +
-                    "5 - View Monthly Savings Report\n6 - Pay Loan");
+                    "5 - View Annual Savings Report\n6 - Pay Loan");
             System.out.print("Choose option: ");
             option = Integer.parseInt(UserInput.getScanner().nextLine());
 
